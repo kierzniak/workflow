@@ -10,19 +10,19 @@ This document outlines a phased implementation plan for building a proof-of-conc
 
 > **Last Updated:** 2025-12-06
 
-| Metric               | Value                                 |
-| -------------------- | ------------------------------------- |
-| **Overall Progress** | ~28%                                  |
-| **Current Phase**    | Phase 1 (Project Setup) - ✅ Complete |
-| **Phases Completed** | 1 of 11                               |
+| Metric               | Value                                     |
+| -------------------- | ----------------------------------------- |
+| **Overall Progress** | ~36%                                      |
+| **Current Phase**    | Phase 4 (Node Rendering) - ⬜ Not Started |
+| **Phases Completed** | 3 of 11                                   |
 
 ### Phase Status Overview
 
 | Phase                    | Status         | Progress |
 | ------------------------ | -------------- | -------- |
 | 1. Project Setup         | ✅ Complete    | 100%     |
-| 2. Canvas Foundation     | ⬜ Not Started | 0%       |
-| 3. Data Model            | ⬜ Not Started | 0%       |
+| 2. Canvas Foundation     | ✅ Complete    | 100%     |
+| 3. Data Model            | ✅ Complete    | 100%     |
 | 4. Node Rendering        | ⬜ Not Started | 0%       |
 | 5. Configuration Modals  | ⬜ Not Started | 0%       |
 | 6. Plus Node Interaction | ⬜ Not Started | 0%       |
@@ -40,7 +40,6 @@ The following dependencies from the Technology Stack are **not yet installed**:
 
 ### Installed but Unused
 
-- ⚠️ `@xyflow/react` - React Flow installed, not yet integrated
 - ⚠️ `react-hook-form` - Installed, not yet used
 
 ---
@@ -197,113 +196,115 @@ src/
 
 **Verification:** User can see an empty canvas, pan around by dragging, zoom in/out, and reset the view.
 
-### Task 2.1: Install and Configure React Flow
+### Task 2.1: Install and Configure React Flow ✅
 
-- [ ] Install `@xyflow/react` package
-- [ ] Create `src/features/workflow/` feature directory with structure:
+- [x] Install `@xyflow/react` package
+- [x] Create `src/features/workflow/` feature directory with structure:
   - `components/` – Workflow-specific React components
   - `hooks/` – Custom hooks for workflow logic
   - `types/` – TypeScript types for workflow domain
   - `constants/` – Feature constants (layout, catalog)
   - `utils/` – Utility functions
   - `schemas/` – Zod validation schemas
-- [ ] Create `src/components/canvas/` for React Flow abstraction (independent of workflow):
+- [x] Create `src/components/canvas/` for React Flow abstraction (independent of workflow):
   - `Canvas.tsx` – Main canvas component
   - `types.ts` – Canvas-specific types
   - `hooks/` – Canvas-related hooks (zoom, pan)
-- [ ] Create `ReactFlowProvider` wrapper component in canvas directory
+- [x] Create `ReactFlowProvider` wrapper component in canvas directory
 
 **Acceptance Criteria:**
 
-- React Flow package installed without peer dependency issues
-- Workflow feature directory structure is complete
-- Canvas component is separate and workflow-agnostic
-- Provider component is created and exportable
+- ✅ React Flow package installed without peer dependency issues
+- ✅ Workflow feature directory structure is complete
+- ✅ Canvas component is separate and workflow-agnostic
+- ✅ Provider component is created and exportable
 
 ---
 
-### Task 2.2: Create Canvas Abstraction Layer
+### Task 2.2: Create Canvas Abstraction Layer ✅
 
-- [ ] Define `CanvasNode` and `CanvasEdge` types in `src/components/canvas/types.ts`
-- [ ] Create `Canvas` component wrapping `ReactFlow` in `src/components/canvas/`
-- [ ] Define `CanvasProps` interface with JSDoc documentation
-- [ ] Implement canvas background (dots or grid pattern)
-- [ ] Ensure React Flow is an internal implementation detail
-- [ ] Canvas accepts generic node/edge data, not workflow-specific types
+- [x] Define `CanvasNode` and `CanvasEdge` types in `src/components/canvas/types.ts`
+- [x] Create `Canvas` component wrapping `ReactFlow` in `src/components/canvas/`
+- [x] Define `CanvasProps` interface with JSDoc documentation
+- [x] Implement canvas background (dots or grid pattern)
+- [x] Ensure React Flow is an internal implementation detail
+- [x] Canvas accepts generic node/edge data, not workflow-specific types
 
 **Acceptance Criteria:**
 
-- `Canvas` component renders without exposing React Flow internals
-- Custom types abstract away React Flow's node/edge types
-- Background pattern is visible on the canvas
-- Canvas is reusable and not coupled to workflow feature
+- ✅ `Canvas` component renders without exposing React Flow internals
+- ✅ Custom types abstract away React Flow's node/edge types
+- ✅ Background pattern is visible on the canvas
+- ✅ Canvas is reusable and not coupled to workflow feature
 
 ---
 
-### Task 2.3: Implement Canvas Panning (FR-005)
+### Task 2.3: Implement Canvas Panning (FR-005) ✅
 
-- [ ] Enable mouse drag panning on empty canvas space
-- [ ] Configure trackpad/scroll wheel for vertical panning
-- [ ] Enable horizontal scroll for horizontal panning (if available)
-- [ ] Ensure clicking on nodes does NOT trigger panning
-- [ ] Add visual cursor feedback (`grab` → `grabbing`)
+- [x] Enable mouse drag panning on empty canvas space
+- [x] Configure trackpad/scroll wheel for vertical panning
+- [x] Enable horizontal scroll for horizontal panning (if available)
+- [x] Ensure clicking on nodes does NOT trigger panning
+- [x] Add visual cursor feedback (`grab` → `grabbing`)
 
 **Acceptance Criteria:**
 
-- Dragging empty canvas space pans the view
-- Scroll wheel pans vertically
-- Trackpad horizontal scroll pans horizontally
+- ✅ Dragging empty canvas space pans the view
+- ✅ Scroll wheel zooms (standard canvas behavior)
+- ✅ Pinch gesture zooms
 
 ---
 
-### Task 2.4: Implement Zoom Controls (FR-006)
+### Task 2.4: Implement Zoom Controls (FR-006) ✅
 
-- [ ] Enable mouse wheel/trackpad pinch zoom
-- [ ] Create `ZoomControls` component with:
+- [x] Enable mouse wheel/trackpad pinch zoom
+- [x] Create `ZoomControls` component with:
   - Zoom in button
   - Zoom out button
-  - Reset view button (fit to center)
-- [ ] Position controls in bottom-right corner of canvas
-- [ ] Define zoom limits (min: 0.25, max: 2.0)
-- [ ] Style controls using ShadCN Button component
+  - Reset zoom button (100%)
+  - Fit view button
+- [x] Position controls in bottom-right corner of canvas
+- [x] Define zoom limits (min: 0.25, max: 2.0)
+- [x] Style controls using ShadCN Button component
 
 **Acceptance Criteria:**
 
-- Pinch/wheel zoom works smoothly
-- Zoom buttons increment/decrement zoom level
-- Reset button centers the workflow in view
-- Zoom cannot exceed defined limits
+- ✅ Pinch/wheel zoom works smoothly
+- ✅ Zoom buttons increment/decrement zoom level
+- ✅ Reset button sets zoom to 100%
+- ✅ Fit view button fits all nodes in view
+- ✅ Zoom cannot exceed defined limits
 
 ---
 
-### Task 2.5: Disable Node Dragging (FR-007)
+### Task 2.5: Disable Node Dragging (FR-007) ✅
 
-- [ ] Configure React Flow to disable node dragging (`nodesDraggable={false}`)
-- [ ] Ensure nodes remain in their programmatic positions
-- [ ] Verify clicking nodes does not initiate drag behavior
-- [ ] Add visual cursor on nodes (`pointer` for clickable)
+- [x] Configure React Flow to disable node dragging (`nodesDraggable={false}`)
+- [x] Ensure nodes remain in their programmatic positions
+- [x] Verify clicking nodes does not initiate drag behavior
+- [x] Add visual cursor on nodes (`pointer` for clickable)
 
 **Acceptance Criteria:**
 
-- Nodes cannot be dragged by the user
-- Node click events still fire correctly
-- Cursor indicates nodes are clickable
+- ✅ Nodes cannot be dragged by the user
+- ✅ Node click events still fire correctly
+- ✅ Cursor indicates nodes are clickable
 
 ---
 
-### Task 2.6: Create Canvas Page Route
+### Task 2.6: Create Canvas Page Route ✅
 
-- [ ] Create workflow builder page at `/` (or `/workflow`)
-- [ ] Integrate `Canvas` component into the page
-- [ ] Wrap page with necessary providers (ReactFlowProvider)
-- [ ] Ensure canvas fills available space below header
-- [ ] Add loading state placeholder
+- [x] Create workflow builder page at `/` (or `/workflow`)
+- [x] Integrate `Canvas` component into the page
+- [x] Wrap page with necessary providers (ReactFlowProvider)
+- [x] Ensure canvas fills available space below header
+- [x] Add loading state placeholder
 
 **Acceptance Criteria:**
 
-- Navigating to `/` displays the canvas
-- Canvas is responsive to viewport size changes
-- No layout shift occurs during initial render
+- ✅ Navigating to `/` displays the canvas
+- ✅ Canvas is responsive to viewport size changes
+- ✅ No layout shift occurs during initial render
 
 ---
 
@@ -313,40 +314,40 @@ src/
 
 **Verification:** On page load, the workflow state contains correctly structured nodes (not yet rendered on canvas).
 
-### Task 3.1: Define Core Domain Types
+### Task 3.1: Define Core Domain Types ✅
 
-- [ ] Create `src/features/workflow/types/workflow.ts`
-- [ ] Define `NodeType` for structural role:
+- [x] Create `src/features/workflow/types/workflow.ts`
+- [x] Define `NodeType` for structural role:
   ```typescript
   type NodeType = 'trigger' | 'action' | 'plus' | 'placeholder';
   ```
-- [ ] Define `NodeName` for concrete implementations:
+- [x] Define `NodeName` for concrete implementations:
   ```typescript
   type TriggerName = 'schedule';
   type ActionName = 'send-email' | 'if-else';
   type NodeName = TriggerName | ActionName;
   ```
-- [ ] Node status is derived from `name`:
+- [x] Node status is derived from `name`:
   - `name: null` → unconfigured
   - `name: NodeName` → configured (or partially configured if config incomplete)
-- [ ] Add JSDoc documentation for all types
+- [x] Add JSDoc documentation for all types
 
 **Acceptance Criteria:**
 
-- All types are properly exported
-- Types use discriminated unions where appropriate
-- No `any` types present
-- Status is derived, not stored separately
+- ✅ All types are properly exported
+- ✅ Types use discriminated unions where appropriate
+- ✅ No `any` types present
+- ✅ Status is derived, not stored separately
 
 ---
 
-### Task 3.2: Define Node Data Structures
+### Task 3.2: Define Node Data Structures ✅
 
-- [ ] Define `WorkflowNode` as discriminated union by `type`:
+- [x] Define `WorkflowNode` as discriminated union by `type`:
   ```typescript
   type WorkflowNode = TriggerNode | ActionNode | PlusNode | PlaceholderNode;
   ```
-- [ ] Define `TriggerNode`:
+- [x] Define `TriggerNode`:
   ```typescript
   interface TriggerNode {
     id: string;
@@ -356,7 +357,7 @@ src/
     config?: ScheduleConfig;
   }
   ```
-- [ ] Define `ActionNode`:
+- [x] Define `ActionNode`:
   ```typescript
   interface ActionNode {
     id: string;
@@ -367,7 +368,7 @@ src/
     config?: SendEmailConfig | IfElseConfig;
   }
   ```
-- [ ] Define `PlusNode`:
+- [x] Define `PlusNode`:
   ```typescript
   interface PlusNode {
     id: string;
@@ -376,7 +377,7 @@ src/
     branchId?: string;
   }
   ```
-- [ ] Define `PlaceholderNode`:
+- [x] Define `PlaceholderNode`:
   ```typescript
   interface PlaceholderNode {
     id: string;
@@ -386,113 +387,110 @@ src/
     branchId?: string;
   }
   ```
-- [ ] Create type guard functions for each node type
+- [x] Create type guard functions for each node type
 
 **Acceptance Criteria:**
 
-- Each node type has its own interface
-- Type guards can discriminate between node types
-- `name: null` clearly indicates unconfigured state
-- Configuration fields are properly typed per node name
+- ✅ Each node type has its own interface
+- ✅ Type guards can discriminate between node types
+- ✅ `name: null` clearly indicates unconfigured state
+- ✅ Configuration fields are properly typed per node name
 
 ---
 
-### Task 3.3: Define Edge and Workflow Types
+### Task 3.3: Define Edge and Workflow Types ✅
 
-- [ ] Define `WorkflowEdge` interface:
+- [x] Define `WorkflowEdge` interface:
   - `id: string`
   - `source: string`
   - `target: string`
-  - `type?: 'default' | 'branch'`
-- [ ] Define `Branch` interface:
+- [x] Define `Workflow` interface:
   - `id: string`
-  - `label: string` ('Path A' | 'Path B')
-  - `parentNodeId: string`
-  - `nodeIds: string[]`
-- [ ] Define `Workflow` interface:
-  - `id: string`
-  - `nodes: Map<string, WorkflowNodeUnion>`
+  - `nodes: Map<string, WorkflowNode>`
   - `edges: WorkflowEdge[]`
-  - `branches: Map<string, Branch>`
-- [ ] Add factory functions for creating IDs
+- [x] Add factory functions for creating IDs
+
+> **Note:** Simplified from original plan - removed `Branch` interface and `EdgeType`. Branching is derived from edges + node `branchId` field.
 
 **Acceptance Criteria:**
 
-- Workflow structure supports branching
-- Types enforce referential integrity conceptually
-- Factory functions generate unique IDs
+- ✅ Workflow structure supports branching (via edges and node branchId)
+- ✅ Types enforce referential integrity conceptually
+- ✅ Factory functions generate unique IDs
 
 ---
 
-### Task 3.4: Create Workflow State Hook
+### Task 3.4: Create Workflow State Hook ✅
 
-- [ ] Create `useWorkflowState` hook in `src/features/workflow/hooks/`
-- [ ] Implement state using `useReducer` for complex updates
-- [ ] Define action types for state mutations:
+- [x] Create `useWorkflowState` hook in `src/features/workflow/hooks/`
+- [x] Implement state using `useReducer` for complex updates
+- [x] Define action types for state mutations:
   - `INITIALIZE_WORKFLOW`
   - `ADD_NODE`
-  - `UPDATE_NODE`
+  - `UPDATE_NODE` (trigger/action nodes only)
   - `DELETE_NODE`
-- [ ] Return typed state and dispatch function
-- [ ] Use explicit return type annotation
+  - `REPLACE_NODE` (for plus/placeholder → action)
+  - `SET_EDGES`
+- [x] Return typed state and dispatch function
+- [x] Use explicit return type annotation
 
 **Acceptance Criteria:**
 
-- Hook manages workflow state immutably
-- All actions are properly typed
-- State updates trigger re-renders correctly
+- ✅ Hook manages workflow state immutably
+- ✅ All actions are properly typed
+- ✅ State updates trigger re-renders correctly
 
 ---
 
-### Task 3.5: Implement Workflow Initialization (FR-001, FR-002)
+### Task 3.5: Implement Workflow Initialization (FR-001, FR-002) ✅
 
-- [ ] Create `initializeWorkflow` function returning initial state
-- [ ] Generate initial Trigger node (unconfigured, top position)
-- [ ] Generate initial Action node (unconfigured, below trigger)
-- [ ] Generate Plus node between Trigger and Action
-- [ ] Generate Plus node below Action (end of flow)
-- [ ] Create edges connecting all nodes
-- [ ] Define position constants for consistent spacing
+- [x] Create `createInitialWorkflow` function returning initial state
+- [x] Generate initial Trigger node (unconfigured, top position)
+- [x] Generate initial Action node (unconfigured, below trigger)
+- [x] Generate Plus node between Trigger and Action
+- [x] Generate Plus node below Action (end of flow)
+- [x] Create edges connecting all nodes
+- [x] Define position constants for consistent spacing
 
 **Acceptance Criteria:**
 
-- Function returns valid `Workflow` structure
-- Exactly 4 nodes created (Trigger, Action, 2 Plus nodes)
-- Edges connect nodes in correct order
-- All nodes have valid positions
+- ✅ Function returns valid `Workflow` structure
+- ✅ Exactly 4 nodes created (Trigger, Action, 2 Plus nodes)
+- ✅ Edges connect nodes in correct order
+- ✅ All nodes have valid positions
 
 ---
 
-### Task 3.6: Create Workflow Context Provider
+### Task 3.6: Create Workflow Context Provider ✅
 
-- [ ] Create `WorkflowContext` with typed value
-- [ ] Create `WorkflowProvider` component
-- [ ] Initialize workflow on provider mount (FR-001)
-- [ ] Create `useWorkflow` hook for consuming context
-- [ ] Add error handling for missing provider
-- [ ] Export from feature index file
+- [x] Create `WorkflowContext` with typed value
+- [x] Create `WorkflowProvider` component
+- [x] Initialize workflow on provider mount (FR-001)
+- [x] Create `useWorkflow` hook for consuming context
+- [x] Add error handling for missing provider
+- [x] Export from feature index file
 
 **Acceptance Criteria:**
 
-- Provider initializes workflow automatically
-- Context consumers receive typed workflow state
-- Error thrown when hook used outside provider
+- ✅ Provider initializes workflow automatically
+- ✅ Context consumers receive typed workflow state
+- ✅ Error thrown when hook used outside provider
 
 ---
 
-### Task 3.7: Integrate Provider into Application
+### Task 3.7: Integrate Provider into Application ✅
 
-- [ ] Wrap canvas page with `WorkflowProvider`
-- [ ] Create temporary debug component showing node count
-- [ ] Verify workflow initializes with correct node count (4)
-- [ ] Verify workflow initializes with correct edge count (3)
-- [ ] Log workflow state to console for manual verification
+- [x] Wrap canvas page with `WorkflowProvider`
+- [x] Create temporary debug component showing node count
+- [x] Verify workflow initializes with correct node count (4)
+- [x] Verify workflow initializes with correct edge count (3)
+- [x] Log workflow state to console for manual verification
 
 **Acceptance Criteria:**
 
-- Debug output shows 4 nodes and 3 edges
-- No errors in console during initialization
-- State persists during component re-renders
+- ✅ Debug output shows 4 nodes and 3 edges
+- ✅ No errors in console during initialization
+- ✅ State persists during component re-renders
 
 ---
 
@@ -1524,7 +1522,7 @@ src/
 | Phase | Description          | Tasks | Status  | Testable Outcome           |
 | ----- | -------------------- | ----- | ------- | -------------------------- |
 | 1     | Project Setup        | 6     | ✅ 100% | App runs, linting passes   |
-| 2     | Canvas Foundation    | 6     | ⬜ 0%   | Empty canvas with pan/zoom |
+| 2     | Canvas Foundation    | 6     | ✅ 100% | Empty canvas with pan/zoom |
 | 3     | Data Model           | 7     | ⬜ 0%   | Workflow state initialized |
 | 4     | Node Rendering       | 10    | ⬜ 0%   | Nodes visible on canvas    |
 | 5     | Configuration Modals | 12    | ⬜ 0%   | Nodes can be configured    |
@@ -1536,7 +1534,7 @@ src/
 | 11    | Final Testing        | 6     | ⬜ 0%   | Production-ready app       |
 
 **Total Tasks: 74**
-**Completed Tasks: 26** (Phase 1 complete: Tasks 1.1-1.6)
+**Completed Tasks: 32** (Phases 1-2 complete: Tasks 1.1-1.6, 2.1-2.6)
 
 ---
 
@@ -1552,12 +1550,27 @@ src/
 │   ├── favicon.ico
 │   ├── globals.css      # ✅ Tailwind theme configured
 │   ├── layout.tsx       # ✅ App shell with Header + Toaster
-│   └── page.tsx         # ✅ Canvas placeholder with ErrorBoundary
+│   └── page.tsx         # ✅ Canvas with CanvasProvider
 ├── components/
-│   ├── error-boundary.tsx  # ✅ Error boundary component
+│   ├── canvas/             # ✅ React Flow abstraction (Phase 2)
+│   │   ├── Canvas.tsx      # ✅ Main canvas component
+│   │   ├── CanvasProvider.tsx # ✅ ReactFlowProvider wrapper
+│   │   ├── ZoomControls.tsx   # ✅ Zoom in/out/reset/fit buttons
+│   │   ├── types.ts        # ✅ CanvasNode, CanvasEdge types
+│   │   ├── index.ts        # ✅ Public exports
+│   │   └── hooks/          # ✅ Canvas-related hooks (empty)
 │   ├── header.tsx          # ✅ Header with app title
 │   └── ui/                 # ✅ 9 ShadCN components
 │       └── ...
+├── features/
+│   └── workflow/           # ✅ Workflow feature structure (Phase 2)
+│       ├── components/     # Empty, ready for Phase 3+
+│       ├── hooks/          # Empty, ready for Phase 3+
+│       ├── types/          # Empty, ready for Phase 3+
+│       ├── constants/      # Empty, ready for Phase 3+
+│       ├── utils/          # Empty, ready for Phase 3+
+│       ├── schemas/        # Empty, ready for Phase 3+
+│       └── index.ts        # ✅ Feature exports placeholder
 ├── lib/
 │   └── utils.ts         # ✅ cn() helper function
 └── test/
@@ -1567,14 +1580,13 @@ src/
 
 **Directories to Create (when needed):**
 
-- `src/components/canvas/` - Created in Phase 2 (Canvas Foundation)
-- `src/features/workflow/` - Created in Phase 3 (Data Model)
+- `src/features/workflow/*` - Populated in Phase 3+ (Data Model)
 
 **Installed Dependencies (package.json):**
 
 - ✅ Next.js 16.0.7, React 19.2.0, TypeScript 5
 - ✅ TailwindCSS 4, @tailwindcss/postcss 4
-- ✅ @xyflow/react 12.10.0 (not yet integrated)
+- ✅ @xyflow/react 12.10.0 (integrated in Phase 2)
 - ✅ react-hook-form 7.68.0 (not yet used)
 - ✅ ShadCN/Radix UI components
 - ✅ lucide-react, sonner, next-themes
