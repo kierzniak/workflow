@@ -25,8 +25,8 @@ The following are **out of scope for this PoC**:
 - **Node** – A single step in the workflow.
 - **Node type (programming)** – Logical kind of node used in the implementation:
   - **Trigger node type** – Starts the workflow. There is exactly one Trigger at the top.
-  - **Action node type** – Performs some action after the trigger or within a branch.  
-    - The **If/Else node** is a *special Action node type* that creates two branches.
+  - **Action node type** – Performs some action after the trigger or within a branch.
+    - The **If/Else node** is a _special Action node type_ that creates two branches.
   - **Plus helper node type** – A utility node (“+”) representing where a new node can be inserted.
   - **Placeholder node type** – Temporary node displayed after clicking “+” and before selecting a concrete node.
 - **Concrete node** – A specific implementation of a node type, e.g.:
@@ -145,7 +145,7 @@ The system **MUST** support at least the following **concrete nodes**:
 - All nodes created via a Plus helper node **MUST** be of node type **Action** (including the **If/Else** Action).
 - Node type **MUST NOT** be changed between Trigger and Action:
   - The initial Trigger node always remains a Trigger-type node.
-  - Action nodes always remain Action-type nodes (but may change between Action *implementations* like “Send Email” ↔ “If/Else”, if supported).
+  - Action nodes always remain Action-type nodes (but may change between Action _implementations_ like “Send Email” ↔ “If/Else”, if supported).
 
 ### FR-011 – Node Positioning Rules (Linear Flow)
 
@@ -312,7 +312,6 @@ The system **MUST** display Plus helper nodes (“+” icons) in the following l
 ### FR-023 – Deletion Behavior (If/Else Action)
 
 - Deleting an **If/Else Action node** with downstream branches is complex; PoC behavior **MUST** be defined clearly and implemented consistently. Options:
-
   - **Option A (simplest)**: Disallow deletion of If/Else nodes that have any child nodes; prompt user to delete branch contents first.
   - **Option B**: When deleting an If/Else node, delete all nodes downstream in both branches.
   - **Option C**: When deleting an If/Else node, merge one branch back into the main path and discard the other (requires clear visual indication and documentation of which branch is kept).
@@ -351,7 +350,7 @@ The UI **SHOULD** visually distinguish these states (e.g., color, icon, badge, o
 ### FR-026 – Branch Creation
 
 - When an **If/Else Action node** is created (whether from the initial Action node or via a Plus helper node):
-  - Two branch lanes **MUST** be created and labeled (e.g., *Path A* and *Path B*).
+  - Two branch lanes **MUST** be created and labeled (e.g., _Path A_ and _Path B_).
   - Under each lane label, the system **MUST** automatically create a single **unconfigured Action node**.
   - A Plus helper node **MUST** be placed below each of these unconfigured Action nodes, marking the end of each branch path.
 - The automatically created unconfigured Action nodes in Path A and Path B **MUST** behave like any other Action node:
@@ -363,7 +362,6 @@ The UI **SHOULD** visually distinguish these states (e.g., color, icon, badge, o
   - Nodes **MUST** be added, edited, and removed using the same Plus-node behavior and rules as the main path.
   - The system **MUST** maintain consistent vertical spacing and automatic layout inside each branch.
   - The first unconfigured Action nodes that are auto-created under an If/Else Action node **MUST** be treated as part of their respective branch paths (Path A and Path B) for all layout and validation rules (e.g., FR-011, FR-024).
-
 
 ### FR-028 – Branch Independence
 
@@ -402,8 +400,8 @@ These are not strictly functional but guide implementation.
 - **React Flow** **MUST** be used for:
   - Rendering the node graph.
   - Managing edges and basic interactions (zoom, pan).
-- **Zod** **MUST** be used for validation and checking output schema 
-- **ShadCN** **MUST** be used for app reusable components like Field, Input, Dialog, Sonner, DropdownMenu and so on. 
+- **Zod** **MUST** be used for validation and checking output schema
+- **ShadCN** **MUST** be used for app reusable components like Field, Input, Dialog, Sonner, DropdownMenu and so on.
 - **TailwindCSS** **MUST** be used for styling
 
 ### FR-032 – Responsiveness
