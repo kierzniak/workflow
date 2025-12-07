@@ -24,6 +24,9 @@ export const VERTICAL_SPACING = 48;
 /** Horizontal spacing between branch lanes for if-else nodes */
 export const BRANCH_HORIZONTAL_SPACING = 400;
 
+/** Gap between inner edges of sibling branches in pixels */
+export const BRANCH_EDGE_GAP = 80;
+
 // =============================================================================
 // Starting Positions
 // =============================================================================

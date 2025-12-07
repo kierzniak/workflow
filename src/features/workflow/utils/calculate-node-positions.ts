@@ -6,7 +6,7 @@ import {
   NODE_WIDTH,
   NODE_HEIGHT,
   PLUS_NODE_SIZE,
-  BRANCH_HORIZONTAL_SPACING,
+  BRANCH_EDGE_GAP,
 } from '@/features/workflow/constants/layout';
 
 /**
@@ -84,6 +84,51 @@ function findTriggerNode(nodes: Map<string, WorkflowNode>): WorkflowNode | undef
 }
 
 /**
+ * Calculates the width of a subtree rooted at the given node.
+ * Used to determine proper spacing for nested branches.
+ *
+ * - Leaf node: NODE_WIDTH
+ * - Linear (1 child): max(NODE_WIDTH, child width)
+ * - Branching (2 children): left width + right width + BRANCH_EDGE_GAP
+ */
+function calculateSubtreeWidth(
+  nodeId: string,
+  adjacency: Map<string, string[]>,
+  nodes: Map<string, WorkflowNode>,
+  visited: Set<string>
+): number {
+  if (visited.has(nodeId)) {
+    return NODE_WIDTH;
+  }
+  visited.add(nodeId);
+
+  const node = nodes.get(nodeId);
+  if (!node) {
+    return NODE_WIDTH;
+  }
+
+  const children = adjacency.get(nodeId) ?? [];
+
+  if (children.length === 0) {
+    return NODE_WIDTH;
+  }
+
+  if (children.length === 1) {
+    const childWidth = calculateSubtreeWidth(children[0], adjacency, nodes, visited);
+    return Math.max(NODE_WIDTH, childWidth);
+  }
+
+  // Branching: sum of both subtree widths plus gap
+  const leftWidth = calculateSubtreeWidth(children[0], adjacency, nodes, visited);
+  const rightWidth =
+    children.length >= 2
+      ? calculateSubtreeWidth(children[1], adjacency, nodes, visited)
+      : NODE_WIDTH;
+
+  return leftWidth + rightWidth + BRANCH_EDGE_GAP;
+}
+
+/**
  * Traverses graph depth-first, assigning positions to nodes.
  * Handles branching by positioning children side-by-side.
  *
@@ -135,8 +180,17 @@ function traverseAndPosition(
   // Branching (2+ children) - position side by side
   // Path A (first child) = left, Path B (second child) = right
   const branchStartY = startY + nodeHeight + VERTICAL_SPACING;
-  const leftX = centerX - BRANCH_HORIZONTAL_SPACING / 2;
-  const rightX = centerX + BRANCH_HORIZONTAL_SPACING / 2;
+
+  // Calculate subtree widths for dynamic spacing
+  const leftWidth = calculateSubtreeWidth(children[0], adjacency, nodes, new Set());
+  const rightWidth =
+    children.length >= 2
+      ? calculateSubtreeWidth(children[1], adjacency, nodes, new Set())
+      : NODE_WIDTH;
+
+  // Position branch centers based on their subtree widths
+  const leftX = centerX - BRANCH_EDGE_GAP / 2 - leftWidth / 2;
+  const rightX = centerX + BRANCH_EDGE_GAP / 2 + rightWidth / 2;
 
   // Process each branch, track max Y reached
   let maxY = branchStartY;
