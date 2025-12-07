@@ -149,12 +149,19 @@ function workflowReducer(state: Workflow, action: WorkflowAction): Workflow {
               target: finalSuccessorId,
             });
           } else {
-            // Plus is at end of path/branch: KEEP it, reconnect predecessor → plus
-            newEdges.push({
-              id: createEdgeId(),
-              source: predecessorId,
-              target: successorId,
-            });
+            // Plus is at end of path/branch
+            const predecessorNode = state.nodes.get(predecessorId);
+            if (predecessorNode?.type === 'plus') {
+              // Predecessor is plus - delete successor plus (avoids two consecutive pluses)
+              newNodes.delete(successorId);
+            } else {
+              // Predecessor is not plus (e.g., if-else) - keep plus as insertion point
+              newEdges.push({
+                id: createEdgeId(),
+                source: predecessorId,
+                target: successorId,
+              });
+            }
           }
         } else {
           // Direct connection (successor is not a plus)
