@@ -1,5 +1,7 @@
 'use client';
 
+import { toast } from 'sonner';
+
 import { Canvas } from '@/components/canvas';
 
 import { useWorkflow } from '@/features/workflow/context';
@@ -61,8 +63,10 @@ export function WorkflowCanvas(): React.ReactElement {
   // Handle confirmed deletion
   const handleConfirmDelete = (): void => {
     if (!dialogData?.node) return;
+    const label = getDeleteNodeLabel();
     deleteNode(dialogData.node.id);
     closeDialog();
+    toast.success(`${label} deleted`);
   };
 
   // Get node label for delete dialog
@@ -120,6 +124,7 @@ export function WorkflowCanvas(): React.ReactElement {
     // Type assertion safe: form validation ensures correct config type for each node
     updateNode(dialogData.node.id, { config } as Partial<typeof dialogData.node>);
     closeDialog();
+    toast.success('Configuration saved');
   };
 
   // Dynamically render the config form based on node definition

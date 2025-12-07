@@ -322,3 +322,23 @@ Okay, let's simplify this task a bit, let's remove any logic that blocks us from
 ```prompt
 Okay, now please complete task 8.5. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
 ```
+
+## Phase 9.
+
+After implementing the phase 8, I moved to the phase 9, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing phase 9, but I think that has already been done. Please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. And check if there is anything else we need to do, or if the changes that have already been made are sufficient. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md
+```
+
+Changes to phase 9 were not necessary.
+
+## Phase 10.
+
+After implementing the phase 9, I moved to the phase 10, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing phase 10, but I think that has already been done. Please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. And check if there is anything else we need to do, or if the changes that have already been made are sufficient. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md
+```
+
+Changes to phase 10 were minimal. We need to implement only toast messages.
