@@ -8,8 +8,10 @@ import { getNodeDefinition, nodeTypes } from './nodes';
 import type { ActionName, NodeConfig, TriggerName } from '@/features/workflow/types';
 import { workflowToCanvasEdges, workflowToCanvasNodes } from '@/features/workflow/utils';
 
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 import { NodeConfigurationDialog } from './NodeConfigurationDialog';
 import { NodeSelectionDialog } from './NodeSelectionDialog';
+import { getNodeCatalogEntry } from './nodes';
 
 const CONFIG_FORM_ID = 'node-config-form';
 
@@ -18,12 +20,14 @@ const CONFIG_FORM_ID = 'node-config-form';
  * Manages node click interactions and dialog state.
  */
 export function WorkflowCanvas(): React.ReactElement {
-  const { workflow, updateNode, insertActionAfterPlus, createIfElseChildren } = useWorkflow();
+  const { workflow, updateNode, deleteNode, insertActionAfterPlus, createIfElseChildren } =
+    useWorkflow();
   const {
     dialogType,
     dialogData,
     handleNodeClick,
     handlePlusNodeClick,
+    handleDeleteClick,
     closeDialog,
     openConfigDialog,
   } = useNodeInteraction();
@@ -38,6 +42,35 @@ export function WorkflowCanvas(): React.ReactElement {
     handlePlusNodeClick(newActionNode);
   };
 
+  // Handle menu configure - opens config dialog for node
+  const handleMenuConfigure = (nodeId: string): void => {
+    const node = workflow.nodes.get(nodeId);
+    if (node && (node.type === 'trigger' || node.type === 'action')) {
+      handleNodeClick(node);
+    }
+  };
+
+  // Handle menu delete - opens confirmation dialog
+  const handleMenuDelete = (nodeId: string): void => {
+    const node = workflow.nodes.get(nodeId);
+    if (node && (node.type === 'trigger' || node.type === 'action') && node.name) {
+      handleDeleteClick(node);
+    }
+  };
+
+  // Handle confirmed deletion
+  const handleConfirmDelete = (): void => {
+    if (!dialogData?.node) return;
+    deleteNode(dialogData.node.id);
+    closeDialog();
+  };
+
+  // Get node label for delete dialog
+  const getDeleteNodeLabel = (): string => {
+    if (!dialogData?.node?.name) return 'Node';
+    return getNodeCatalogEntry(dialogData.node.name)?.label ?? 'Node';
+  };
+
   // Transform nodes with click handlers (positions recalculated from graph structure)
   const nodes = workflowToCanvasNodes(
     workflow.nodes,
@@ -46,6 +79,8 @@ export function WorkflowCanvas(): React.ReactElement {
         const node = workflow.nodes.get(nodeId);
         if (node) handleNodeClick(node);
       },
+      onConfigure: handleMenuConfigure,
+      onDelete: handleMenuDelete,
       onPlusClick,
     },
     workflow
@@ -128,6 +163,14 @@ export function WorkflowCanvas(): React.ReactElement {
           {renderConfigForm()}
         </NodeConfigurationDialog>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={dialogType === 'delete-confirmation'}
+        onOpenChange={(open) => !open && closeDialog()}
+        nodeLabel={getDeleteNodeLabel()}
+        onConfirm={handleConfirmDelete}
+      />
     </>
   );
 }

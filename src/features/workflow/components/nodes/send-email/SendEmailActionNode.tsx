@@ -14,7 +14,9 @@ export interface SendEmailActionNodeProps {
     node: ActionNodeType;
     step: number;
     onClick?: () => void;
-    onMenuClick?: () => void;
+    onConfigure?: () => void;
+    onDelete?: () => void;
+    showDelete: boolean;
   };
 }
 
@@ -33,10 +35,16 @@ function getSendEmailDescription(node: ActionNodeType): string {
  * Concrete implementation of action for name='send-email'.
  */
 export function SendEmailActionNode({ data }: SendEmailActionNodeProps): ReactNode {
-  const { node, step, onClick, onMenuClick } = data;
+  const { node, step, onClick, onConfigure, onDelete, showDelete } = data;
 
   return (
-    <ConfiguredNode id={node.id} onClick={onClick} onMenuClick={onMenuClick}>
+    <ConfiguredNode
+      id={node.id}
+      onClick={onClick}
+      onConfigure={onConfigure}
+      onDelete={onDelete}
+      showDelete={showDelete}
+    >
       <NodeBadge>
         <Mail className="h-3.5 w-3.5" />
         Send Email

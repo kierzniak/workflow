@@ -13,7 +13,9 @@ export interface ScheduleTriggerNodeProps {
   data: {
     node: TriggerNodeType;
     onClick?: () => void;
-    onMenuClick?: () => void;
+    onConfigure?: () => void;
+    onDelete?: () => void;
+    showDelete: boolean;
   };
 }
 
@@ -42,10 +44,16 @@ function getScheduleDescription(node: TriggerNodeType): string {
  * Concrete implementation of trigger for name='schedule'.
  */
 export function ScheduleTriggerNode({ data }: ScheduleTriggerNodeProps): ReactNode {
-  const { node, onClick, onMenuClick } = data;
+  const { node, onClick, onConfigure, onDelete, showDelete } = data;
 
   return (
-    <ConfiguredNode id={node.id} onClick={onClick} onMenuClick={onMenuClick}>
+    <ConfiguredNode
+      id={node.id}
+      onClick={onClick}
+      onConfigure={onConfigure}
+      onDelete={onDelete}
+      showDelete={showDelete}
+    >
       <NodeBadge>
         <Calendar className="h-3.5 w-3.5" />
         Schedule

@@ -36,7 +36,9 @@ interface PlusNodeData extends CanvasNodeData {
 interface TriggerNodeData extends CanvasNodeData {
   node: TriggerNode;
   onClick?: () => void;
-  onMenuClick?: () => void;
+  onConfigure?: () => void;
+  onDelete?: () => void;
+  showDelete: boolean;
 }
 
 /**
@@ -46,7 +48,9 @@ interface ActionNodeData extends CanvasNodeData {
   node: ActionNode;
   step: number;
   onClick?: () => void;
-  onMenuClick?: () => void;
+  onConfigure?: () => void;
+  onDelete?: () => void;
+  showDelete: boolean;
 }
 
 /**
@@ -101,7 +105,8 @@ function transformNode(
   allNodes: WorkflowNode[],
   callbacks?: {
     onClick?: (nodeId: string) => void;
-    onMenuClick?: (nodeId: string) => void;
+    onConfigure?: (nodeId: string) => void;
+    onDelete?: (nodeId: string) => void;
     onPlusClick?: (nodeId: string) => void;
   }
 ): CanvasNode<WorkflowCanvasNodeData> {
@@ -109,7 +114,8 @@ function transformNode(
   const step = calculateStepNumber(node, allNodes);
 
   const onClick = callbacks?.onClick ? () => callbacks.onClick!(node.id) : undefined;
-  const onMenuClick = callbacks?.onMenuClick ? () => callbacks.onMenuClick!(node.id) : undefined;
+  const onConfigure = callbacks?.onConfigure ? () => callbacks.onConfigure!(node.id) : undefined;
+  const onDelete = callbacks?.onDelete ? () => callbacks.onDelete!(node.id) : undefined;
 
   let data: WorkflowCanvasNodeData;
 
@@ -129,7 +135,7 @@ function transformNode(
       };
       data = { node: placeholderNode, step, onClick };
     } else {
-      data = { node, onClick, onMenuClick };
+      data = { node, onClick, onConfigure, onDelete, showDelete: false };
     }
   } else {
     // Action node
@@ -143,7 +149,7 @@ function transformNode(
       };
       data = { node: placeholderNode, step, onClick };
     } else {
-      data = { node, step, onClick, onMenuClick };
+      data = { node, step, onClick, onConfigure, onDelete, showDelete: true };
     }
   }
 
@@ -168,7 +174,8 @@ export function workflowToCanvasNodes(
   nodes: Map<string, WorkflowNode>,
   callbacks?: {
     onClick?: (nodeId: string) => void;
-    onMenuClick?: (nodeId: string) => void;
+    onConfigure?: (nodeId: string) => void;
+    onDelete?: (nodeId: string) => void;
     onPlusClick?: (nodeId: string) => void;
   },
   workflow?: Workflow

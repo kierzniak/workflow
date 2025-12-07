@@ -9,6 +9,7 @@ import type {
   PlusNode,
 } from '@/features/workflow/types';
 import { createNodeId, createEdgeId } from '@/features/workflow/types';
+import { getAllDescendantIds } from '@/features/workflow/utils/workflow-helpers';
 
 // =============================================================================
 // Action Types
@@ -89,11 +90,82 @@ function workflowReducer(state: Workflow, action: WorkflowAction): Workflow {
 
     case 'DELETE_NODE': {
       const { id } = action.payload;
+      const nodeToDelete = state.nodes.get(id);
+
+      // Safety: don't delete if node doesn't exist or is a trigger
+      if (!nodeToDelete || nodeToDelete.type === 'trigger') return state;
+
       const newNodes = new Map(state.nodes);
       newNodes.delete(id);
 
-      // Remove edges connected to this node
-      const newEdges = state.edges.filter((edge) => edge.source !== id && edge.target !== id);
+      // Find edges connected to this node
+      const incomingEdge = state.edges.find((e) => e.target === id);
+      const outgoingEdges = state.edges.filter((e) => e.source === id);
+
+      // Check if this is an if-else node (has 2 outgoing edges = branches)
+      const isIfElse = outgoingEdges.length === 2;
+
+      if (isIfElse) {
+        // Cascade delete: remove all descendants
+        const descendantIds = getAllDescendantIds(id, state);
+        for (const descId of descendantIds) {
+          newNodes.delete(descId);
+        }
+
+        // Remove all edges involving deleted nodes
+        const deletedNodeIds = new Set([id, ...descendantIds]);
+        const newEdges = state.edges.filter(
+          (e) => !deletedNodeIds.has(e.source) && !deletedNodeIds.has(e.target)
+        );
+
+        // Predecessor (plus) now becomes end of path - no reconnection needed
+        return { ...state, nodes: newNodes, edges: newEdges };
+      }
+
+      // Linear deletion
+      const outgoingEdge = outgoingEdges[0]; // Single outgoing edge (or undefined)
+
+      // Start with edges not connected to deleted node
+      let newEdges = state.edges.filter((e) => e.source !== id && e.target !== id);
+
+      // If we have both predecessor and successor, reconnect the path
+      if (incomingEdge && outgoingEdge) {
+        const predecessorId = incomingEdge.source;
+        const successorId = outgoingEdge.target;
+        const successorNode = state.nodes.get(successorId);
+
+        // If successor is a plus node
+        if (successorNode?.type === 'plus') {
+          const plusOutgoingEdge = state.edges.find((e) => e.source === successorId);
+          const finalSuccessorId = plusOutgoingEdge?.target;
+
+          if (finalSuccessorId) {
+            // Plus has a successor: remove plus, connect predecessor → final successor
+            newNodes.delete(successorId);
+            newEdges = newEdges.filter((e) => e.source !== successorId && e.target !== successorId);
+            newEdges.push({
+              id: createEdgeId(),
+              source: predecessorId,
+              target: finalSuccessorId,
+            });
+          } else {
+            // Plus is at end of path/branch: KEEP it, reconnect predecessor → plus
+            newEdges.push({
+              id: createEdgeId(),
+              source: predecessorId,
+              target: successorId,
+            });
+          }
+        } else {
+          // Direct connection (successor is not a plus)
+          newEdges.push({
+            id: createEdgeId(),
+            source: predecessorId,
+            target: successorId,
+          });
+        }
+      }
+      // If only incoming edge (node was at end of path), just remove it
 
       return {
         ...state,

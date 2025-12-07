@@ -10,11 +10,11 @@ This document outlines a phased implementation plan for building a proof-of-conc
 
 > **Last Updated:** 2025-12-07
 
-| Metric               | Value                                        |
-| -------------------- | -------------------------------------------- |
-| **Overall Progress** | ~50%                                         |
-| **Current Phase**    | Phase 7 (If/Else Branching) - 🔄 In Progress |
-| **Phases Completed** | 5 of 11                                      |
+| Metric               | Value                                    |
+| -------------------- | ---------------------------------------- |
+| **Overall Progress** | ~73%                                     |
+| **Current Phase**    | Phase 9 (Visual Polish) - ⬜ Not Started |
+| **Phases Completed** | 8 of 11                                  |
 
 ### Phase Status Overview
 
@@ -26,8 +26,8 @@ This document outlines a phased implementation plan for building a proof-of-conc
 | 4. Node Rendering        | ✅ Complete    | 100%     |
 | 5. Configuration Modals  | ✅ Complete    | 100%     |
 | 6. Plus Node Interaction | ✅ Complete    | 100%     |
-| 7. If/Else Branching     | 🔄 In Progress | 33%      |
-| 8. Node Deletion         | ⬜ Not Started | 0%       |
+| 7. If/Else Branching     | ✅ Complete    | 100%     |
+| 8. Node Deletion         | ✅ Complete    | 100%     |
 | 9. Visual Polish         | ⬜ Not Started | 0%       |
 | 10. Error Handling       | ⬜ Not Started | 0%       |
 | 11. Final Testing        | ⬜ Not Started | 0%       |
@@ -1063,105 +1063,86 @@ All node rendering tasks completed. The workflow canvas now displays:
 
 **Verification:** User can delete nodes via context menu, confirm deletion, and see the workflow update correctly.
 
-### Task 8.1: Create Node Context Menu (FR-021)
+### Task 8.1: Create Node Context Menu (FR-021) ✅
 
-- [ ] Create `NodeContextMenu` component using ShadCN DropdownMenu
-- [ ] Add "Delete" menu item with destructive styling
-- [ ] Add "Configure" menu item (opens config modal)
-- [ ] Trigger menu on right-click or menu button click
-- [ ] Position menu relative to node
-
-**Acceptance Criteria:**
-
-- Context menu appears on right-click
-- Menu items are clearly labeled
-- Menu closes on item selection or outside click
-
----
-
-### Task 8.2: Create Delete Confirmation Dialog
-
-- [ ] Create `DeleteConfirmationDialog` component
-- [ ] Display warning message about deletion
-- [ ] Show node name being deleted
-- [ ] Add "Cancel" and "Delete" buttons
-- [ ] Style Delete button as destructive
+- [x] Create `NodeContextMenu` component using ShadCN DropdownMenu
+- [x] Add "Delete" menu item with destructive styling (hidden for trigger nodes)
+- [x] Add "Configure" menu item (opens config modal)
+- [x] Trigger menu on menu button click
+- [x] Position menu relative to node (align="end")
 
 **Acceptance Criteria:**
 
-- Dialog clearly communicates action
-- Cancel returns without deletion
-- Delete confirms and proceeds
+- ✅ Context menu appears on menu button click
+- ✅ Menu items are clearly labeled
+- ✅ Menu closes on item selection or outside click
+- ✅ Delete option hidden for trigger nodes
 
 ---
 
-### Task 8.3: Implement Linear Node Deletion (FR-022)
+### Task 8.2: Create Delete Confirmation Dialog ✅
 
-- [ ] Create `deleteNode` function in workflow reducer
-- [ ] Handle deletion in linear path:
+- [x] Create `DeleteConfirmationDialog` component
+- [x] Display warning message about deletion
+- [x] Show node name being deleted
+- [x] Add "Cancel" and "Delete" buttons
+- [x] Style Delete button as destructive
+
+**Acceptance Criteria:**
+
+- ✅ Dialog clearly communicates action
+- ✅ Cancel returns without deletion
+- ✅ Delete confirms and proceeds
+
+---
+
+### Task 8.3: Implement Linear Node Deletion (FR-022) ✅
+
+- [x] Enhance `DELETE_NODE` reducer action in workflow state
+- [x] Handle deletion in linear path:
   - Remove the node
   - Reconnect predecessor to successor
-  - Ensure Plus node exists between remaining nodes
-  - Recalculate positions
-- [ ] Prevent deletion of initial Trigger node (FR-010)
-- [ ] Update edges after deletion
+  - Remove extra plus node (after deleted node) to avoid duplicates
+  - Positions recalculated automatically by calculateNodePositions
+- [x] Prevent deletion of trigger nodes (blocked in reducer)
+- [x] Update edges after deletion
 
 **Acceptance Criteria:**
 
-- Node is removed from workflow
-- Path remains connected
-- Plus nodes are correctly placed
-- Trigger node cannot be deleted
+- ✅ Node is removed from workflow
+- ✅ Path remains connected
+- ✅ Plus nodes are correctly placed (no duplicates)
+- ✅ Trigger node cannot be deleted
 
 ---
 
-### Task 8.4: Implement If/Else Deletion Rules (FR-023)
+### Task 8.4: Implement If/Else Cascade Deletion ✅
 
-- [ ] Implement Option A: Disallow deletion if branches have children
-- [ ] When attempting to delete If/Else with children:
-  - Show error message
-  - Prompt user to delete branch contents first
-- [ ] Allow deletion of empty If/Else (no children in branches)
-- [ ] Clean up branch structures on valid deletion
+- [x] Detect if-else nodes (2 outgoing edges)
+- [x] Cascade delete all branch descendants using `getAllDescendantIds` helper
+- [x] Remove all edges involving deleted nodes
+- [x] Predecessor (plus) becomes end of path
 
 **Acceptance Criteria:**
 
-- If/Else with children shows error on delete attempt
-- Empty If/Else can be deleted
-- Branch metadata is cleaned up
+- ✅ Deleting if-else cascades to all branch descendants
+- ✅ Edges properly cleaned up
+- ✅ Predecessor remains as end of path
 
 ---
 
-### Task 8.5: Implement Branch Node Deletion
+### Task 8.5: Implement Branch Node Deletion ✅
 
-- [ ] Handle deletion of nodes within a branch
-- [ ] Maintain branch structure after deletion
-- [ ] Ensure Plus nodes remain correctly placed
-- [ ] Allow deletion of auto-created branch Action nodes
-- [ ] Update branch node references
-
-**Acceptance Criteria:**
-
-- Branch nodes can be deleted
-- Branch structure remains valid
-- Plus nodes maintain correct positions
-
----
-
-### Task 8.6: Test Deletion Scenarios
-
-- [ ] Test deleting middle node in linear path
-- [ ] Test deleting last node in linear path
-- [ ] Test attempting to delete Trigger node
-- [ ] Test deleting If/Else with empty branches
-- [ ] Test attempting to delete If/Else with children
-- [ ] Test deleting nodes within branches
+- [x] Handle deletion of nodes within a branch
+- [x] Preserve Plus nodes at end of path/branch
+- [x] Maintain branch structure after deletion
+- [x] Update DELETE_NODE to keep plus when `!finalSuccessorId`
 
 **Acceptance Criteria:**
 
-- All deletion scenarios work correctly
-- No orphaned nodes or edges
-- State consistency maintained
+- ✅ Branch nodes can be deleted
+- ✅ Branch structure remains valid
+- ✅ Plus nodes at end of branches are preserved
 
 ---
 

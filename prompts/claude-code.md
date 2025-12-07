@@ -292,3 +292,33 @@ Okay, now please complete task 7.2. Please show me code that we will be implemen
 ```
 
 After this task, there were some in the relevant branches. That is why it was necessary to change the plan a bit after the implementation. Instead of conditionally bringing the successor to the left branch, I decided to always bring it, because there is always some advantage there.
+
+## Phase 8.
+
+After implementing the phase 7, I moved to the phase 8, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing task 8.1 from phase 8, please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md.
+```
+
+```prompt
+Okay, now please complete task 8.2. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 8.3. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 8.4. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+For the simplification of this task, I have abandoned the task in which we check if/else has any children and prevent the removal of this node.
+
+```prompt
+Okay, let's simplify this task a bit, let's remove any logic that blocks us from deleting the if/else node. If we want to delete the if/else node, both branches will be deleted, meaning it will work exactly the same as all the other nodes.
+```
+
+```prompt
+Okay, now please complete task 8.5. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```

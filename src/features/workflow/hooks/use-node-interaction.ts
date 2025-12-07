@@ -7,7 +7,7 @@ import { useDialog } from '@/hooks';
 import type { TriggerNode, ActionNode, WorkflowNode } from '@/features/workflow/types';
 
 /** Dialog types for node interaction */
-type NodeDialogType = 'node-selection' | 'node-configuration';
+type NodeDialogType = 'node-selection' | 'node-configuration' | 'delete-confirmation';
 
 /** Data passed to node dialogs */
 interface NodeDialogData {
@@ -26,6 +26,8 @@ export interface UseNodeInteractionReturn {
   handleNodeClick: (node: WorkflowNode) => void;
   /** Handle plus node click - opens selection dialog for the new action node */
   handlePlusNodeClick: (actionNode: ActionNode) => void;
+  /** Handle delete click - opens delete confirmation dialog */
+  handleDeleteClick: (node: TriggerNode | ActionNode) => void;
   /** Close current dialog (safe to call during transitions) */
   closeDialog: () => void;
   /** Open configuration dialog for a node */
@@ -92,6 +94,17 @@ export function useNodeInteraction(): UseNodeInteractionReturn {
     [openDialog]
   );
 
+  /**
+   * Handle delete click - opens delete confirmation dialog.
+   */
+  const handleDeleteClick = useCallback(
+    (node: TriggerNode | ActionNode) => {
+      const nodeType = node.type === 'trigger' ? 'trigger' : 'action';
+      openDialog('delete-confirmation', { node, nodeType });
+    },
+    [openDialog]
+  );
+
   // Safe close that won't interfere with dialog transitions
   const closeDialog = useCallback(() => {
     if (!isTransitioningRef.current) {
@@ -104,6 +117,7 @@ export function useNodeInteraction(): UseNodeInteractionReturn {
     dialogData,
     handleNodeClick,
     handlePlusNodeClick,
+    handleDeleteClick,
     closeDialog,
     openConfigDialog,
   };

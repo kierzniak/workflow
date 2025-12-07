@@ -5,16 +5,22 @@ import { type ReactNode } from 'react';
 import { NODE_HEIGHT, NODE_PADDING, NODE_WIDTH } from '@/features/workflow/constants/layout';
 import { cn } from '@/lib/utils';
 
+import { NodeContextMenu } from '../NodeContextMenu';
+
 /**
  * Props for the ConfiguredNode component.
  */
 export interface ConfiguredNodeProps {
   /** Unique node identifier */
   id: string;
-  /** Click handler for the node */
+  /** Click handler for the node body */
   onClick?: () => void;
-  /** Menu button click handler */
-  onMenuClick?: () => void;
+  /** Called when Configure menu item is clicked */
+  onConfigure?: () => void;
+  /** Called when Delete menu item is clicked */
+  onDelete?: () => void;
+  /** Whether to show delete option (false for trigger nodes) */
+  showDelete?: boolean;
   /** Content to render inside the node */
   children: ReactNode;
   /** Additional CSS classes */
@@ -36,7 +42,9 @@ export interface ConfiguredNodeProps {
 export function ConfiguredNode({
   id,
   onClick,
-  onMenuClick,
+  onConfigure,
+  onDelete,
+  showDelete = true,
   children,
   className,
 }: ConfiguredNodeProps): ReactNode {
@@ -77,22 +85,22 @@ export function ConfiguredNode({
           }
         }}
       >
-        {/* Menu button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onMenuClick?.();
-          }}
-          className={cn(
-            'absolute top-2 right-2 p-1 rounded',
-            'text-gray-400 hover:text-gray-600 hover:bg-gray-100',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7297c5]'
-          )}
-          aria-label="Node menu"
-        >
-          <MoreVertical className="h-4 w-4" />
-        </button>
+        {/* Context Menu */}
+        <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
+          <NodeContextMenu onConfigure={onConfigure} onDelete={onDelete} showDelete={showDelete}>
+            <button
+              type="button"
+              className={cn(
+                'p-1 rounded',
+                'text-gray-400 hover:text-gray-600 hover:bg-gray-100',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7297c5]'
+              )}
+              aria-label="Node menu"
+            >
+              <MoreVertical className="h-4 w-4" />
+            </button>
+          </NodeContextMenu>
+        </div>
 
         {children}
       </div>
