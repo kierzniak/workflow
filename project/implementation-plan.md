@@ -13,7 +13,7 @@ This document outlines a phased implementation plan for building a proof-of-conc
 | Metric               | Value                                     |
 | -------------------- | ----------------------------------------- |
 | **Overall Progress** | ~36%                                      |
-| **Current Phase**    | Phase 4 (Node Rendering) - ⬜ Not Started |
+| **Current Phase**    | Phase 4 (Node Rendering) - 🔄 In Progress |
 | **Phases Completed** | 3 of 11                                   |
 
 ### Phase Status Overview
@@ -23,7 +23,7 @@ This document outlines a phased implementation plan for building a proof-of-conc
 | 1. Project Setup         | ✅ Complete    | 100%     |
 | 2. Canvas Foundation     | ✅ Complete    | 100%     |
 | 3. Data Model            | ✅ Complete    | 100%     |
-| 4. Node Rendering        | ⬜ Not Started | 0%       |
+| 4. Node Rendering        | 🔄 In Progress | 80%      |
 | 5. Configuration Modals  | ⬜ Not Started | 0%       |
 | 6. Plus Node Interaction | ⬜ Not Started | 0%       |
 | 7. If/Else Branching     | ⬜ Not Started | 0%       |
@@ -500,177 +500,212 @@ src/
 
 **Verification:** User sees Trigger node, Action node, and Plus nodes rendered on the canvas in a vertical layout.
 
-### Task 4.1: Create Node Position Calculator
+### Task 4.1: Create Node Position Calculator ✅
 
-- [ ] Create `calculateNodePositions` utility function
-- [ ] Define layout constants:
-  - `NODE_WIDTH: 280`
-  - `NODE_HEIGHT: 80`
-  - `VERTICAL_SPACING: 100`
+- [x] Create `calculateNodePositions` utility function
+- [x] Define layout constants:
+  - `NODE_WIDTH: 320`
+  - `NODE_HEIGHT: 98` (actual rendered height)
+  - `NODE_PADDING: 12`
+  - `VERTICAL_SPACING: 48` (gap between nodes)
   - `PLUS_NODE_SIZE: 32`
   - `BRANCH_HORIZONTAL_SPACING: 320`
-- [ ] Calculate positions based on workflow structure
-- [ ] Handle linear layout (single column centered)
-- [ ] Return position map: `Map<nodeId, {x, y}>`
+- [x] Calculate positions based on workflow structure
+- [x] Handle linear layout (single column centered)
+- [x] Account for different node heights (content nodes vs plus nodes)
+- [x] Return position map: `Map<nodeId, {x, y}>`
 
 **Acceptance Criteria:**
 
-- Positions are calculated deterministically
-- Constants are configurable
-- Function is pure (no side effects)
+- ✅ Positions are calculated deterministically
+- ✅ Constants are configurable
+- ✅ Function is pure (no side effects)
+- ✅ Node heights properly accounted for in spacing
 
 ---
 
-### Task 4.2: Create Base Node Component
+### Task 4.2: Create ConfiguredNode Base Component ✅
 
-- [ ] Create `BaseNode` component in `src/features/workflow/components/nodes/`
-- [ ] Define `BaseNodeProps` interface with JSDoc
-- [ ] Implement base styling (border, background, shadow)
-- [ ] Add status indicator (derive from `name`: null vs set)
-- [ ] Support `onClick` handler prop
-- [ ] Use composition for node content
+> **Refactored in Task 4.6**: Originally `BaseNode` with status prop. Now split into `PlaceholderNode` (unconfigured) and `ConfiguredNode` (configured).
+
+- [x] Create `ConfiguredNode` component for configured nodes
+- [x] Define `ConfiguredNodeProps` interface with JSDoc
+- [x] Implement solid border styling with shadow
+- [x] Support `onClick` and `onMenuClick` handler props
+- [x] Use composition for node content
+- [x] Add menu button (onMenuClick handler)
+- [x] Create `NodeBadge` sub-component (#7297c5 brand color)
+- [x] Create `NodeDescription` sub-component (step number + text)
 
 **Acceptance Criteria:**
 
-- Component renders with consistent styling
-- Click events propagate correctly
-- Status (name null vs name set) is visually distinguishable
+- ✅ Component renders with consistent styling
+- ✅ Click events propagate correctly
+- ✅ Menu button works independently
 
 ---
 
-### Task 4.3: Create Trigger Node Component (FR-008)
+### Task 4.3: Create Trigger Node Components (FR-008) ✅
 
-- [ ] Create `TriggerNode` component extending `BaseNode`
-- [ ] Add trigger-specific styling (e.g., purple accent like Zapier)
-- [ ] Display "Trigger" label when `name: null`
-- [ ] Display node name label when configured (e.g., "Schedule")
-- [ ] Add trigger icon (changes based on `name`)
-- [ ] Show step number ("1.")
+> **Refactored in Task 4.6**: Generic `TriggerNode` replaced by `PlaceholderNode` with `forType='trigger'`.
+
+- [x] Create `ScheduleTriggerNode` for concrete schedule trigger (name='schedule')
+- [x] Display "Schedule" label with Calendar icon
+- [x] Show step number ("1.")
+- [x] Uses `ConfiguredNode` composition
 
 **Acceptance Criteria:**
 
-- Trigger node has distinct visual style
-- Label shows "Trigger" when `name` is null, otherwise shows name
-- Icon renders correctly
+- ✅ Schedule trigger has distinct visual style
+- ✅ Icon renders correctly (Calendar)
 
 ---
 
-### Task 4.4: Create Action Node Component (FR-008)
+### Task 4.4: Create Action Node Components (FR-008) ✅
 
-- [ ] Create `ActionNode` component extending `BaseNode`
-- [ ] Add action-specific styling (e.g., teal accent)
-- [ ] Display "Action" label when `name: null`
-- [ ] Display node name when configured (e.g., "Send Email", "If/Else")
-- [ ] Add action icon (changes based on `name`)
-- [ ] Show step number dynamically
+> **Refactored in Task 4.6**: Generic `ActionNode` replaced by `PlaceholderNode` with `forType='action'`.
+
+- [x] Create `SendEmailActionNode` for send-email action (name='send-email')
+- [x] Create `IfElseActionNode` for if-else action (name='if-else')
+- [x] Add action icons (Mail for email, GitBranch for if-else)
+- [x] Show step number dynamically via `step` prop
+- [x] All use `ConfiguredNode` composition
 
 **Acceptance Criteria:**
 
-- Action node has distinct visual style from Trigger
-- Label shows "Action" when `name` is null, otherwise shows name
-- Step numbers are correctly calculated
+- ✅ Action nodes have distinct visual style
+- ✅ Step numbers are passed dynamically
 
 ---
 
-### Task 4.5: Create Plus Helper Node Component (FR-013)
+### Task 4.5: Create Plus Helper Node Component (FR-013) ✅
 
-- [ ] Create `PlusNode` component
-- [ ] Style as circular button with "+" icon
-- [ ] Size: 32x32 pixels
-- [ ] Add hover state (scale up, color change)
-- [ ] Position on edge line between nodes
-- [ ] Make focusable for accessibility
+- [x] Create `PlusNode` component
+- [x] Style as circular button with "+" icon
+- [x] Size: 32x32 pixels (uses PLUS_NODE_SIZE constant)
+- [x] Add hover state (scale up, color change to #7297c5 fill)
+- [x] Position on edge line between nodes
+- [x] Make focusable for accessibility (focus-visible ring)
 
 **Acceptance Criteria:**
 
-- Plus node is visually smaller than content nodes
-- Hover feedback is visible
-- Keyboard accessible (focusable, activatable)
+- ✅ Plus node is visually smaller than content nodes
+- ✅ Hover feedback is visible (scale-110, bg fill, shadow)
+- ✅ Keyboard accessible (focusable, activatable)
 
 ---
 
-### Task 4.6: Create Placeholder Node Component (FR-008)
+### Task 4.6: Create Placeholder Node Component (FR-008) ✅
 
-- [ ] Create `PlaceholderNode` component
-- [ ] Style with dashed border indicating temporary state
-- [ ] Display "Select a node type..." text
-- [ ] Match size of Action node
-- [ ] Add subtle animation (pulse or shimmer)
+> **Architecture Change**: PlaceholderNode replaces generic TriggerNode/ActionNode. Uses `forType` prop to determine badge (Trigger/Action).
+
+- [x] Create `PlaceholderNode` component for unconfigured trigger/action slots
+- [x] Style with dashed border (gray)
+- [x] Display badge based on `forType` ("Trigger" with Zap icon, "Action" with CirclePlus icon)
+- [x] Display description based on `forType`
+- [x] Match size of configured nodes (NODE_WIDTH x NODE_HEIGHT)
+- [x] Keyboard accessible (focusable, activatable)
 
 **Acceptance Criteria:**
 
-- Placeholder is visually distinct from configured nodes
-- User understands this is a temporary state
-- Animation is subtle and not distracting
+- ✅ Placeholder is visually distinct from configured nodes (dashed vs solid border)
+- ✅ User understands what type of node can be added (badge shows Trigger/Action)
+- ✅ Consistent sizing with other nodes
 
 ---
 
-### Task 4.7: Register Custom Nodes with React Flow
+### Task 4.7: Register Custom Nodes with React Flow ✅
 
-- [ ] Create `nodeTypes` configuration object
-- [ ] Register all custom node components:
-  - `trigger` → `TriggerNode`
-  - `action` → `ActionNode`
-  - `plus` → `PlusNode`
+- [x] Create `nodeTypes` configuration object in `src/features/workflow/node-types.ts`
+- [x] Register all custom node components:
   - `placeholder` → `PlaceholderNode`
-- [ ] Pass `nodeTypes` to `Canvas` component
-- [ ] Verify React Flow recognizes custom types
+  - `plus` → `PlusNode`
+  - `schedule-trigger` → `ScheduleTriggerNode`
+  - `send-email-action` → `SendEmailActionNode`
+  - `if-else-action` → `IfElseActionNode`
+- [x] Export `nodeTypes` from feature index
+- [x] Pass `nodeTypes` to `Canvas` component in page.tsx
+- [x] Verify React Flow recognizes custom types (build passes)
 
 **Acceptance Criteria:**
 
-- No React Flow warnings about unknown node types
-- Each node type renders its custom component
-- Type configuration is centralized
+- ✅ No React Flow warnings about unknown node types
+- ✅ Each node type renders its custom component
+- ✅ Type configuration is centralized
 
 ---
 
-### Task 4.8: Transform Workflow State to React Flow Nodes
+### Task 4.8: Transform Workflow State to React Flow Nodes ✅
 
-- [ ] Create `workflowToCanvasNodes` transformer function
-- [ ] Map `WorkflowNode` to React Flow `Node` type
-- [ ] Include node data for custom component consumption
-- [ ] Memoize transformation for performance
-- [ ] Handle all node types correctly
+- [x] Create `workflowToCanvasNodes` transformer function in `src/features/workflow/utils/workflow-to-canvas.ts`
+- [x] Map `WorkflowNode` to React Flow `Node` type
+- [x] Include node data for custom component consumption
+- [x] Handle all node types correctly:
+  - `trigger` (name=null) → `placeholder` with forType='trigger'
+  - `trigger` (name='schedule') → `schedule-trigger`
+  - `action` (name=null) → `placeholder` with forType='action'
+  - `action` (name='send-email') → `send-email-action`
+  - `action` (name='if-else') → `if-else-action`
+  - `placeholder` → `placeholder`
+  - `plus` → `plus`
+- [x] Step numbers calculated based on Map order (trigger=1, actions=2+)
+
+> **Note**: No manual memoization - React Compiler handles optimization.
 
 **Acceptance Criteria:**
 
-- Transformation is type-safe
-- All workflow nodes produce valid React Flow nodes
-- Custom data is accessible in node components
+- ✅ Transformation is type-safe
+- ✅ All workflow nodes produce valid React Flow nodes
+- ✅ Custom data is accessible in node components
 
 ---
 
-### Task 4.9: Transform Workflow Edges to React Flow Edges
+### Task 4.9: Transform Workflow Edges to React Flow Edges ✅
 
-- [ ] Create `workflowToCanvasEdges` transformer function
-- [ ] Map `WorkflowEdge` to React Flow `Edge` type
-- [ ] Style edges (color, stroke width)
-- [ ] Configure edge routing (step or bezier)
-- [ ] Ensure edges connect to correct node handles
+- [x] Create `workflowToCanvasEdges` transformer function in `src/features/workflow/utils/workflow-to-canvas.ts`
+- [x] Map `WorkflowEdge` to React Flow `CanvasEdge` type
+- [x] Style edges with brand color (#7297c5), stroke width 2px
+- [x] Configure edge routing as `smoothstep` (Zapier-style)
+- [x] Update `CanvasEdge` type to support `style` property
 
 **Acceptance Criteria:**
 
-- All edges render between correct nodes
-- Edge styling is consistent
-- No orphaned edges or errors
+- ✅ All edges render between correct nodes
+- ✅ Edge styling is consistent (smoothstep, #7297c5, 2px)
+- ✅ No orphaned edges or errors
 
 ---
 
-### Task 4.10: Render Initial Workflow on Canvas
+### Task 4.10: Render Initial Workflow on Canvas ✅
 
-- [ ] Connect workflow state to Canvas component
-- [ ] Pass transformed nodes and edges to React Flow
-- [ ] Verify all 4 nodes render in correct positions
-- [ ] Verify all 3 edges connect correctly
-- [ ] Auto-fit view on initial render
+- [x] Create `WorkflowCanvas` component that connects workflow state to Canvas
+- [x] Use `workflowToCanvasNodes` and `workflowToCanvasEdges` transformers
+- [x] Fix Canvas edge style passthrough (was missing `style` property)
+- [x] Pass transformed nodes and edges to React Flow
+- [x] Center workflow using `fitView` with `maxZoom: 1`
+- [x] Add React Flow `Handle` components to all nodes for edge connections
 
 **Acceptance Criteria:**
 
-- Trigger node at top
-- Plus node below Trigger
-- Action node below Plus
-- Plus node below Action
-- Edges visible connecting all nodes
+- ✅ Trigger placeholder at top (step 1)
+- ✅ Plus node below Trigger (centered horizontally)
+- ✅ Action placeholder below Plus (step 2)
+- ✅ Plus node below Action (centered horizontally)
+- ✅ Edges visible with smoothstep routing and brand color (#7297c5)
+- ✅ Workflow centered on screen at zoom 1
+- ✅ No React Flow console warnings
+
+---
+
+## Phase 4 Complete ✅
+
+All node rendering tasks completed. The workflow canvas now displays:
+
+- 2 placeholder nodes (unconfigured trigger and action)
+- 2 plus nodes (for adding new nodes)
+- 3 smoothstep edges connecting all nodes
+- Proper vertical spacing accounting for node heights
+- Centered layout at 100% zoom
 
 ---
 
@@ -1523,8 +1558,8 @@ src/
 | ----- | -------------------- | ----- | ------- | -------------------------- |
 | 1     | Project Setup        | 6     | ✅ 100% | App runs, linting passes   |
 | 2     | Canvas Foundation    | 6     | ✅ 100% | Empty canvas with pan/zoom |
-| 3     | Data Model           | 7     | ⬜ 0%   | Workflow state initialized |
-| 4     | Node Rendering       | 10    | ⬜ 0%   | Nodes visible on canvas    |
+| 3     | Data Model           | 7     | ✅ 100% | Workflow state initialized |
+| 4     | Node Rendering       | 10    | 🔄 40%  | Nodes visible on canvas    |
 | 5     | Configuration Modals | 12    | ⬜ 0%   | Nodes can be configured    |
 | 6     | Node Addition        | 4     | ⬜ 0%   | Plus nodes add new nodes   |
 | 7     | Branching            | 6     | ⬜ 0%   | If/Else creates branches   |
@@ -1534,7 +1569,7 @@ src/
 | 11    | Final Testing        | 6     | ⬜ 0%   | Production-ready app       |
 
 **Total Tasks: 74**
-**Completed Tasks: 32** (Phases 1-2 complete: Tasks 1.1-1.6, 2.1-2.6)
+**Completed Tasks: 36** (Phases 1-3 complete + Tasks 4.1-4.4)
 
 ---
 
@@ -1563,14 +1598,15 @@ src/
 │   └── ui/                 # ✅ 9 ShadCN components
 │       └── ...
 ├── features/
-│   └── workflow/           # ✅ Workflow feature structure (Phase 2)
-│       ├── components/     # Empty, ready for Phase 3+
-│       ├── hooks/          # Empty, ready for Phase 3+
-│       ├── types/          # Empty, ready for Phase 3+
-│       ├── constants/      # Empty, ready for Phase 3+
-│       ├── utils/          # Empty, ready for Phase 3+
-│       ├── schemas/        # Empty, ready for Phase 3+
-│       └── index.ts        # ✅ Feature exports placeholder
+│   └── workflow/           # ✅ Workflow feature structure
+│       ├── components/     # ✅ index.ts, nodes/BaseNode.tsx
+│       ├── hooks/          # ✅ use-workflow-state.ts
+│       ├── types/          # ✅ workflow.ts (all domain types)
+│       ├── constants/      # ✅ layout.ts (node dimensions, spacing)
+│       ├── utils/          # ✅ create-initial-workflow.ts, calculate-node-positions.ts
+│       ├── context/        # ✅ workflow-context.tsx
+│       ├── schemas/        # Empty, ready for Phase 5+
+│       └── index.ts        # ✅ Feature exports
 ├── lib/
 │   └── utils.ts         # ✅ cn() helper function
 └── test/

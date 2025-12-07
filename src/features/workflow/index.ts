@@ -61,7 +61,60 @@ export { useWorkflowState } from './hooks';
 export type { UseWorkflowStateReturn } from './hooks';
 
 // Utils
-export { createInitialWorkflow } from './utils';
+export {
+  createInitialWorkflow,
+  calculateNodePositions,
+  workflowToCanvasNodes,
+  workflowToCanvasEdges,
+} from './utils';
+export type { NodePositionMap, WorkflowCanvasNodeData } from './utils';
+
+// Constants
+export {
+  NODE_WIDTH,
+  NODE_HEIGHT,
+  NODE_PADDING,
+  PLUS_NODE_SIZE,
+  VERTICAL_SPACING,
+  BRANCH_HORIZONTAL_SPACING,
+  CANVAS_CENTER_X,
+  CANVAS_START_Y,
+} from './constants/layout';
 
 // Context
 export { WorkflowProvider, useWorkflow } from './context';
+
+// Node types registry (React Flow)
+export { nodeTypes } from './node-types';
+
+// Components
+export {
+  // Placeholder (unconfigured nodes)
+  PlaceholderNode as PlaceholderNodeComponent,
+  // Configured node base
+  ConfiguredNode,
+  NodeBadge,
+  NodeDescription,
+  // Trigger nodes
+  ScheduleTriggerNode,
+  // Action nodes
+  SendEmailActionNode,
+  IfElseActionNode,
+  // Helper nodes
+  PlusNode as PlusNodeComponent,
+} from './components';
+export type {
+  // Placeholder props
+  PlaceholderNodeProps,
+  // Configured node props
+  ConfiguredNodeProps,
+  NodeBadgeProps,
+  NodeDescriptionProps,
+  // Trigger node props
+  ScheduleTriggerNodeProps,
+  // Action node props
+  SendEmailActionNodeProps,
+  IfElseActionNodeProps,
+  // Helper node props
+  PlusNodeProps,
+} from './components';

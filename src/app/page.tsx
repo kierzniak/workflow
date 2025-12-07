@@ -1,7 +1,13 @@
 'use client';
 
 import { Canvas, CanvasProvider } from '@/components/canvas';
-import { WorkflowProvider, useWorkflow } from '@/features/workflow';
+import {
+  nodeTypes,
+  WorkflowProvider,
+  useWorkflow,
+  workflowToCanvasNodes,
+  workflowToCanvasEdges,
+} from '@/features/workflow';
 
 /**
  * Temporary debug component to verify workflow initialization.
@@ -28,12 +34,24 @@ function WorkflowDebug() {
   );
 }
 
+/**
+ * Canvas wrapper that connects workflow state to Canvas component.
+ */
+function WorkflowCanvas() {
+  const { workflow } = useWorkflow();
+
+  const nodes = workflowToCanvasNodes(workflow.nodes);
+  const edges = workflowToCanvasEdges(workflow.edges);
+
+  return <Canvas nodes={nodes} edges={edges} nodeTypes={nodeTypes} />;
+}
+
 export default function Home() {
   return (
     <WorkflowProvider>
       <CanvasProvider>
         <WorkflowDebug />
-        <Canvas nodes={[]} edges={[]} />
+        <WorkflowCanvas />
       </CanvasProvider>
     </WorkflowProvider>
   );

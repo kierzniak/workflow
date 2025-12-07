@@ -6,23 +6,7 @@ import type {
   WorkflowEdge,
 } from '@/features/workflow/types';
 import { createWorkflowId, createNodeId, createEdgeId } from '@/features/workflow/types';
-
-// =============================================================================
-// Layout Constants
-// =============================================================================
-
-/** Horizontal center position for main flow nodes */
-const NODE_CENTER_X = 400;
-
-/** Vertical spacing between nodes */
-const NODE_VERTICAL_GAP = 100;
-
-/** Starting Y position for the first node */
-const NODE_START_Y = 100;
-
-// =============================================================================
-// Initial Workflow Factory
-// =============================================================================
+import { calculateNodePositions } from '@/features/workflow/utils/calculate-node-positions';
 
 /**
  * Creates an initial workflow with:
@@ -42,31 +26,31 @@ export function createInitialWorkflow(): Workflow {
   const actionId = createNodeId();
   const plusEndId = createNodeId();
 
-  // Create nodes
+  // Create nodes with placeholder positions (will be calculated)
   const triggerNode: TriggerNode = {
     id: triggerId,
     type: 'trigger',
     name: null,
-    position: { x: NODE_CENTER_X, y: NODE_START_Y },
+    position: { x: 0, y: 0 },
   };
 
   const plusBetweenNode: PlusNode = {
     id: plusBetweenId,
     type: 'plus',
-    position: { x: NODE_CENTER_X, y: NODE_START_Y + NODE_VERTICAL_GAP },
+    position: { x: 0, y: 0 },
   };
 
   const actionNode: ActionNode = {
     id: actionId,
     type: 'action',
     name: null,
-    position: { x: NODE_CENTER_X, y: NODE_START_Y + NODE_VERTICAL_GAP * 2 },
+    position: { x: 0, y: 0 },
   };
 
   const plusEndNode: PlusNode = {
     id: plusEndId,
     type: 'plus',
-    position: { x: NODE_CENTER_X, y: NODE_START_Y + NODE_VERTICAL_GAP * 3 },
+    position: { x: 0, y: 0 },
   };
 
   // Create edges
@@ -83,9 +67,21 @@ export function createInitialWorkflow(): Workflow {
   nodes.set(actionId, actionNode);
   nodes.set(plusEndId, plusEndNode);
 
-  return {
+  // Create workflow with placeholder positions
+  const workflow: Workflow = {
     id: workflowId,
     nodes,
     edges,
   };
+
+  // Calculate and apply positions
+  const positions = calculateNodePositions(workflow);
+  for (const [nodeId, position] of positions) {
+    const node = nodes.get(nodeId);
+    if (node) {
+      node.position = position;
+    }
+  }
+
+  return workflow;
 }

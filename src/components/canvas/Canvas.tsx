@@ -51,6 +51,7 @@ export function Canvas<T extends CanvasNodeData = CanvasNodeData>({
     source: edge.source,
     target: edge.target,
     type: edge.type,
+    style: edge.style,
   }));
 
   // Handle node click - extract node ID for callback
@@ -82,7 +83,7 @@ export function Canvas<T extends CanvasNodeData = CanvasNodeData>({
         minZoom={0.25}
         maxZoom={2.0}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ maxZoom: 1 }}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
         <Panel position="bottom-right" className="m-4">

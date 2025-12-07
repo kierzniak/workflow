@@ -30,6 +30,10 @@ export interface CanvasEdge {
   source: string;
   target: string;
   type?: string;
+  style?: {
+    stroke?: string;
+    strokeWidth?: number;
+  };
 }
 
 /** Viewport state for pan/zoom */
