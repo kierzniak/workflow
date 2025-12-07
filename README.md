@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workflow
+
+Visual workflow automation platform (Zapier-like) for designing automated workflows through a no-code builder interface.
+
+**Live Demo:** https://workflow-gs.vercel.app
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev      # Start development server
+pnpm build    # Production build
+pnpm start    # Start production server
+pnpm lint     # Run ESLint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Triggers
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Schedule** - Run workflow on a schedule (hourly, daily, weekly, monthly)
+- **Webhook** - Run workflow when HTTP request is received
 
-## Learn More
+### Actions
 
-To learn more about Next.js, take a look at the following resources:
+- **Send Email** - Send an email to a recipient
+- **Send SMS** - Send an SMS message to a phone number
+- **If/Else** - Branch workflow based on conditions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Documentation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Project documentation is located in the `/project/` directory:
 
-## Deploy on Vercel
+- `functional-requirement.md` - Complete functional requirements specification
+- `implementation-plan.md` - Implementation plan and architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Prompts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Saved prompts used to build this application are located in the `/prompts/` directory:
+
+- `claude-code.md` - Development history with phase-by-phase prompts
+- `funcional-requirments.md` - Original prompt for functional requirements
+- `implementation-plan.md` - Original prompt for implementation plan
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- React Flow (@xyflow/react)
