@@ -5,12 +5,12 @@ import { type ReactNode } from 'react';
 import { NODE_HEIGHT, NODE_PADDING, NODE_WIDTH } from '@/features/workflow/constants/layout';
 import { cn } from '@/lib/utils';
 
-import { NodeContextMenu } from '../NodeContextMenu';
+import { NodeContextMenu } from './NodeContextMenu';
 
 /**
- * Props for the ConfiguredNode component.
+ * Props for the Node component.
  */
-export interface ConfiguredNodeProps {
+export interface NodeProps {
   /** Unique node identifier */
   id: string;
   /** Click handler for the node body */
@@ -28,18 +28,18 @@ export interface ConfiguredNodeProps {
 }
 
 /**
- * Base component for configured nodes (Schedule, SendEmail, IfElse, etc.).
+ * Base component for workflow nodes (Schedule, SendEmail, IfElse, etc.).
  * Provides consistent styling with solid border and menu button.
  *
  * @example
  * ```tsx
- * <ConfiguredNode id="node-1" onClick={handleClick} onMenuClick={handleMenu}>
+ * <Node id="node-1" onClick={handleClick}>
  *   <NodeBadge><Calendar /> Schedule</NodeBadge>
  *   <NodeDescription step={1}>Every Day at 9:00 AM</NodeDescription>
- * </ConfiguredNode>
+ * </Node>
  * ```
  */
-export function ConfiguredNode({
+export function Node({
   id,
   onClick,
   onConfigure,
@@ -47,7 +47,7 @@ export function ConfiguredNode({
   showDelete = true,
   children,
   className,
-}: ConfiguredNodeProps): ReactNode {
+}: NodeProps): ReactNode {
   return (
     <>
       <Handle

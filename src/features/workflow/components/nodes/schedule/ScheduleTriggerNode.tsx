@@ -3,7 +3,8 @@ import { type ReactNode } from 'react';
 
 import type { TriggerNode as TriggerNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
+import { Node, NodeBadge, NodeDescription } from '../Node';
+import { useNodeDialog } from '../NodeDialogContext';
 
 /**
  * Props for ScheduleTriggerNode component (React Flow custom node).
@@ -12,9 +13,6 @@ export interface ScheduleTriggerNodeProps {
   /** Node data from React Flow */
   data: {
     node: TriggerNodeType;
-    onClick?: () => void;
-    onConfigure?: () => void;
-    onDelete?: () => void;
     showDelete: boolean;
   };
 }
@@ -44,14 +42,15 @@ function getScheduleDescription(node: TriggerNodeType): string {
  * Concrete implementation of trigger for name='schedule'.
  */
 export function ScheduleTriggerNode({ data }: ScheduleTriggerNodeProps): ReactNode {
-  const { node, onClick, onConfigure, onDelete, showDelete } = data;
+  const { node, showDelete } = data;
+  const { handleNodeClick, openConfigDialog, openDeleteDialog } = useNodeDialog();
 
   return (
-    <ConfiguredNode
+    <Node
       id={node.id}
-      onClick={onClick}
-      onConfigure={onConfigure}
-      onDelete={onDelete}
+      onClick={() => handleNodeClick(node)}
+      onConfigure={() => openConfigDialog(node)}
+      onDelete={() => openDeleteDialog(node)}
       showDelete={showDelete}
     >
       <NodeBadge>
@@ -59,6 +58,6 @@ export function ScheduleTriggerNode({ data }: ScheduleTriggerNodeProps): ReactNo
         Schedule
       </NodeBadge>
       <NodeDescription step={1}>{getScheduleDescription(node)}</NodeDescription>
-    </ConfiguredNode>
+    </Node>
   );
 }

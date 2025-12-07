@@ -9,12 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
-import {
-  getNodeCatalogByType,
-  type ActionName,
-  type NodeCatalogEntry,
-  type TriggerName,
-} from './nodes';
+import { getNodeCatalogByType, type ActionName, type TriggerName } from './registry';
+import type { NodeCatalogEntry } from './types';
 
 export interface NodeSelectionDialogProps {
   /** Whether the dialog is open */

@@ -14,9 +14,9 @@ import {
 } from '@/components/ui/dialog';
 
 /**
- * Props for DeleteConfirmationDialog component.
+ * Props for NodeDeleteDialog component.
  */
-export interface DeleteConfirmationDialogProps {
+export interface NodeDeleteDialogProps {
   /** Whether the dialog is open */
   open: boolean;
   /** Called when open state changes */
@@ -31,12 +31,12 @@ export interface DeleteConfirmationDialogProps {
  * Confirmation dialog for node deletion.
  * Displays warning and requires explicit confirmation.
  */
-export function DeleteConfirmationDialog({
+export function NodeDeleteDialog({
   open,
   onOpenChange,
   nodeLabel,
   onConfirm,
-}: DeleteConfirmationDialogProps): ReactNode {
+}: NodeDeleteDialogProps): ReactNode {
   const handleConfirm = (): void => {
     onConfirm();
     onOpenChange(false);

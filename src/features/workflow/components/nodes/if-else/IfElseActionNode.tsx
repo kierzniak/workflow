@@ -3,7 +3,8 @@ import { type ReactNode } from 'react';
 
 import type { ActionNode as ActionNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
+import { Node, NodeBadge, NodeDescription } from '../Node';
+import { useNodeDialog } from '../NodeDialogContext';
 
 /**
  * Props for IfElseActionNode component (React Flow custom node).
@@ -13,9 +14,6 @@ export interface IfElseActionNodeProps {
   data: {
     node: ActionNodeType;
     step: number;
-    onClick?: () => void;
-    onConfigure?: () => void;
-    onDelete?: () => void;
     showDelete: boolean;
   };
 }
@@ -48,14 +46,15 @@ function getIfElseDescription(node: ActionNodeType): string {
  * Concrete implementation of action for name='if-else'.
  */
 export function IfElseActionNode({ data }: IfElseActionNodeProps): ReactNode {
-  const { node, step, onClick, onConfigure, onDelete, showDelete } = data;
+  const { node, step, showDelete } = data;
+  const { handleNodeClick, openConfigDialog, openDeleteDialog } = useNodeDialog();
 
   return (
-    <ConfiguredNode
+    <Node
       id={node.id}
-      onClick={onClick}
-      onConfigure={onConfigure}
-      onDelete={onDelete}
+      onClick={() => handleNodeClick(node)}
+      onConfigure={() => openConfigDialog(node)}
+      onDelete={() => openDeleteDialog(node)}
       showDelete={showDelete}
     >
       <NodeBadge>
@@ -63,6 +62,6 @@ export function IfElseActionNode({ data }: IfElseActionNodeProps): ReactNode {
         If/Else
       </NodeBadge>
       <NodeDescription step={step}>{getIfElseDescription(node)}</NodeDescription>
-    </ConfiguredNode>
+    </Node>
   );
 }

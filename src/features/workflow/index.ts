@@ -96,7 +96,7 @@ export {
   getNodeDefinition,
   nodeTypes,
   // Shared components
-  ConfiguredNode,
+  Node,
   NodeBadge,
   NodeDescription,
   PlaceholderNode as PlaceholderNodeComponent,
@@ -125,7 +125,7 @@ export type {
   NodeCatalogEntry,
   NodeDefinition,
   // Shared component props
-  ConfiguredNodeProps,
+  NodeProps,
   NodeBadgeProps,
   NodeDescriptionProps,
   PlaceholderNodeProps,

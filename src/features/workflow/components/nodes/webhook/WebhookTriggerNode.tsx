@@ -3,7 +3,8 @@ import { type ReactNode } from 'react';
 
 import type { TriggerNode as TriggerNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
+import { Node, NodeBadge, NodeDescription } from '../Node';
+import { useNodeDialog } from '../NodeDialogContext';
 
 /**
  * Props for WebhookTriggerNode component (React Flow custom node).
@@ -12,9 +13,6 @@ export interface WebhookTriggerNodeProps {
   /** Node data from React Flow */
   data: {
     node: TriggerNodeType;
-    onClick?: () => void;
-    onConfigure?: () => void;
-    onDelete?: () => void;
     showDelete: boolean;
   };
 }
@@ -34,14 +32,15 @@ function getWebhookDescription(node: TriggerNodeType): string {
  * Concrete implementation of trigger for name='webhook'.
  */
 export function WebhookTriggerNode({ data }: WebhookTriggerNodeProps): ReactNode {
-  const { node, onClick, onConfigure, onDelete, showDelete } = data;
+  const { node, showDelete } = data;
+  const { handleNodeClick, openConfigDialog, openDeleteDialog } = useNodeDialog();
 
   return (
-    <ConfiguredNode
+    <Node
       id={node.id}
-      onClick={onClick}
-      onConfigure={onConfigure}
-      onDelete={onDelete}
+      onClick={() => handleNodeClick(node)}
+      onConfigure={() => openConfigDialog(node)}
+      onDelete={() => openDeleteDialog(node)}
       showDelete={showDelete}
     >
       <NodeBadge>
@@ -49,6 +48,6 @@ export function WebhookTriggerNode({ data }: WebhookTriggerNodeProps): ReactNode
         Webhook
       </NodeBadge>
       <NodeDescription step={1}>{getWebhookDescription(node)}</NodeDescription>
-    </ConfiguredNode>
+    </Node>
   );
 }

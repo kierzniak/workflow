@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { getNodeCatalogEntry } from './nodes';
+import { getNodeCatalogEntry } from './registry';
 import type { ActionNode, TriggerNode } from '@/features/workflow/types';
 
 /** Node types that can be configured */

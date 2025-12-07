@@ -3,8 +3,11 @@ import { Plus } from 'lucide-react';
 import { type ReactNode } from 'react';
 
 import { PLUS_NODE_SIZE } from '@/features/workflow/constants/layout';
+import { useWorkflow } from '@/features/workflow/context';
 import type { PlusNode as PlusNodeType } from '@/features/workflow/types';
 import { cn } from '@/lib/utils';
+
+import { useNodeDialog } from './NodeDialogContext';
 
 /**
  * Props for PlusNode component (React Flow custom node).
@@ -13,7 +16,6 @@ export interface PlusNodeProps {
   /** Node data from React Flow */
   data: {
     node: PlusNodeType;
-    onClick?: () => void;
   };
 }
 
@@ -22,7 +24,14 @@ export interface PlusNodeProps {
  * Displayed between nodes on the edge line.
  */
 export function PlusNode({ data }: PlusNodeProps): ReactNode {
-  const { node, onClick } = data;
+  const { node } = data;
+  const { insertActionAfterPlus } = useWorkflow();
+  const { openSelectionDialog } = useNodeDialog();
+
+  const handleClick = (): void => {
+    const newActionNode = insertActionAfterPlus(node.id);
+    openSelectionDialog(newActionNode);
+  };
 
   return (
     <>
@@ -34,7 +43,7 @@ export function PlusNode({ data }: PlusNodeProps): ReactNode {
       <button
         type="button"
         data-node-id={node.id}
-        onClick={onClick}
+        onClick={handleClick}
         className={cn(
           // Base styles
           'flex items-center justify-center rounded-full',

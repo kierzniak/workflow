@@ -15,12 +15,23 @@ export type { ActionName, NodeName, TriggerName } from './registry';
 export type { ConfigFormProps, IconComponent, NodeCatalogEntry, NodeDefinition } from './types';
 
 // Shared components
-export { ConfiguredNode, NodeBadge, NodeDescription } from './ConfiguredNode';
-export type { ConfiguredNodeProps, NodeBadgeProps, NodeDescriptionProps } from './ConfiguredNode';
+export { Node, NodeBadge, NodeDescription } from './Node';
+export type { NodeProps, NodeBadgeProps, NodeDescriptionProps } from './Node';
 export { PlaceholderNode } from './PlaceholderNode';
 export type { PlaceholderNodeProps } from './PlaceholderNode';
 export { PlusNode } from './PlusNode';
 export type { PlusNodeProps } from './PlusNode';
+
+// Node dialogs and context
+export { NodeDialogProvider, useNodeDialog } from './NodeDialogContext';
+export { NodeContextMenu } from './NodeContextMenu';
+export type { NodeContextMenuProps } from './NodeContextMenu';
+export { NodeConfigurationDialog } from './NodeConfigurationDialog';
+export type { NodeConfigurationDialogProps, ConfigurableNode } from './NodeConfigurationDialog';
+export { NodeDeleteDialog } from './NodeDeleteDialog';
+export type { NodeDeleteDialogProps } from './NodeDeleteDialog';
+export { NodeSelectionDialog } from './NodeSelectionDialog';
+export type { NodeSelectionDialogProps } from './NodeSelectionDialog';
 
 // Schedule node
 export {

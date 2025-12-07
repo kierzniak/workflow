@@ -18,8 +18,9 @@ import { calculateNodePositions } from './calculate-node-positions';
  */
 interface PlaceholderNodeData extends CanvasNodeData {
   node: PlaceholderNode;
+  /** Original trigger/action node for dialog context */
+  originalNode: TriggerNode | ActionNode;
   step: number;
-  onClick?: () => void;
 }
 
 /**
@@ -27,7 +28,6 @@ interface PlaceholderNodeData extends CanvasNodeData {
  */
 interface PlusNodeData extends CanvasNodeData {
   node: PlusNode;
-  onClick?: () => void;
 }
 
 /**
@@ -35,9 +35,6 @@ interface PlusNodeData extends CanvasNodeData {
  */
 interface TriggerNodeData extends CanvasNodeData {
   node: TriggerNode;
-  onClick?: () => void;
-  onConfigure?: () => void;
-  onDelete?: () => void;
   showDelete: boolean;
 }
 
@@ -47,9 +44,6 @@ interface TriggerNodeData extends CanvasNodeData {
 interface ActionNodeData extends CanvasNodeData {
   node: ActionNode;
   step: number;
-  onClick?: () => void;
-  onConfigure?: () => void;
-  onDelete?: () => void;
   showDelete: boolean;
 }
 
@@ -102,28 +96,24 @@ function calculateStepNumber(node: WorkflowNode, allNodes: WorkflowNode[]): numb
  */
 function transformNode(
   node: WorkflowNode,
-  allNodes: WorkflowNode[],
-  callbacks?: {
-    onClick?: (nodeId: string) => void;
-    onConfigure?: (nodeId: string) => void;
-    onDelete?: (nodeId: string) => void;
-    onPlusClick?: (nodeId: string) => void;
-  }
+  allNodes: WorkflowNode[]
 ): CanvasNode<WorkflowCanvasNodeData> {
   const nodeType = getNodeType(node);
   const step = calculateStepNumber(node, allNodes);
 
-  const onClick = callbacks?.onClick ? () => callbacks.onClick!(node.id) : undefined;
-  const onConfigure = callbacks?.onConfigure ? () => callbacks.onConfigure!(node.id) : undefined;
-  const onDelete = callbacks?.onDelete ? () => callbacks.onDelete!(node.id) : undefined;
-
   let data: WorkflowCanvasNodeData;
 
   if (node.type === 'plus') {
-    const plusClick = callbacks?.onPlusClick ? () => callbacks.onPlusClick!(node.id) : undefined;
-    data = { node, onClick: plusClick };
+    data = { node };
   } else if (node.type === 'placeholder') {
-    data = { node, step, onClick };
+    // Pure placeholder nodes shouldn't exist in workflow, but handle for safety
+    const dummyOriginal: TriggerNode = {
+      id: node.id,
+      type: 'trigger',
+      name: null,
+      position: node.position,
+    };
+    data = { node, originalNode: dummyOriginal, step };
   } else if (node.type === 'trigger') {
     if (node.name === null) {
       // Render unconfigured trigger as placeholder
@@ -133,9 +123,9 @@ function transformNode(
         position: node.position,
         forType: 'trigger',
       };
-      data = { node: placeholderNode, step, onClick };
+      data = { node: placeholderNode, originalNode: node, step };
     } else {
-      data = { node, onClick, onConfigure, onDelete, showDelete: false };
+      data = { node, showDelete: false };
     }
   } else {
     // Action node
@@ -147,9 +137,9 @@ function transformNode(
         position: node.position,
         forType: 'action',
       };
-      data = { node: placeholderNode, step, onClick };
+      data = { node: placeholderNode, originalNode: node, step };
     } else {
-      data = { node, step, onClick, onConfigure, onDelete, showDelete: true };
+      data = { node, step, showDelete: true };
     }
   }
 
@@ -166,18 +156,11 @@ function transformNode(
  * Recalculates positions from graph structure to ensure correct layout.
  *
  * @param nodes - Map of workflow nodes
- * @param callbacks - Optional click handlers
  * @param workflow - Full workflow for position calculation
  * @returns Array of canvas nodes ready for React Flow
  */
 export function workflowToCanvasNodes(
   nodes: Map<string, WorkflowNode>,
-  callbacks?: {
-    onClick?: (nodeId: string) => void;
-    onConfigure?: (nodeId: string) => void;
-    onDelete?: (nodeId: string) => void;
-    onPlusClick?: (nodeId: string) => void;
-  },
   workflow?: Workflow
 ): CanvasNode<WorkflowCanvasNodeData>[] {
   // Recalculate positions from graph structure
@@ -188,7 +171,7 @@ export function workflowToCanvasNodes(
     // Apply calculated position or use stored position as fallback
     const position = positions.get(node.id) ?? node.position;
     const nodeWithPosition = { ...node, position };
-    return transformNode(nodeWithPosition, nodeArray, callbacks);
+    return transformNode(nodeWithPosition, nodeArray);
   });
 }
 

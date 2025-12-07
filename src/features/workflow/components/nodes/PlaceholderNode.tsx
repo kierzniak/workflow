@@ -3,8 +3,14 @@ import { CirclePlus, Zap } from 'lucide-react';
 import { type ReactNode } from 'react';
 
 import { NODE_HEIGHT, NODE_PADDING, NODE_WIDTH } from '@/features/workflow/constants/layout';
-import type { PlaceholderNode as PlaceholderNodeType } from '@/features/workflow/types';
+import type {
+  ActionNode,
+  PlaceholderNode as PlaceholderNodeType,
+  TriggerNode,
+} from '@/features/workflow/types';
 import { cn } from '@/lib/utils';
+
+import { useNodeDialog } from './NodeDialogContext';
 
 /**
  * Props for PlaceholderNode component (React Flow custom node).
@@ -13,8 +19,9 @@ export interface PlaceholderNodeProps {
   /** Node data from React Flow */
   data: {
     node: PlaceholderNodeType;
+    /** Original trigger/action node for dialog context */
+    originalNode: TriggerNode | ActionNode;
     step: number;
-    onClick?: () => void;
   };
 }
 
@@ -36,9 +43,14 @@ const PLACEHOLDER_CONFIG = {
  * Displays a dashed border with badge indicating what type of node can be added.
  */
 export function PlaceholderNode({ data }: PlaceholderNodeProps): ReactNode {
-  const { node, step, onClick } = data;
+  const { node, originalNode, step } = data;
+  const { openSelectionDialog } = useNodeDialog();
   const config = PLACEHOLDER_CONFIG[node.forType];
   const Icon = config.icon;
+
+  const handleClick = (): void => {
+    openSelectionDialog(originalNode);
+  };
 
   return (
     <>
@@ -49,7 +61,7 @@ export function PlaceholderNode({ data }: PlaceholderNodeProps): ReactNode {
       />
       <div
         data-node-id={node.id}
-        onClick={onClick}
+        onClick={handleClick}
         className={cn(
           // Base styles
           'relative flex flex-col gap-1 rounded-lg bg-white cursor-pointer',
@@ -72,7 +84,7 @@ export function PlaceholderNode({ data }: PlaceholderNodeProps): ReactNode {
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            onClick?.();
+            handleClick();
           }
         }}
       >

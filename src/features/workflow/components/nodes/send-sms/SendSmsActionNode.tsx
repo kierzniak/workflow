@@ -3,7 +3,8 @@ import { type ReactNode } from 'react';
 
 import type { ActionNode as ActionNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
+import { Node, NodeBadge, NodeDescription } from '../Node';
+import { useNodeDialog } from '../NodeDialogContext';
 
 /**
  * Props for SendSmsActionNode component (React Flow custom node).
@@ -13,9 +14,6 @@ export interface SendSmsActionNodeProps {
   data: {
     node: ActionNodeType;
     step: number;
-    onClick?: () => void;
-    onConfigure?: () => void;
-    onDelete?: () => void;
     showDelete: boolean;
   };
 }
@@ -35,14 +33,15 @@ function getSendSmsDescription(node: ActionNodeType): string {
  * Concrete implementation of action for name='send-sms'.
  */
 export function SendSmsActionNode({ data }: SendSmsActionNodeProps): ReactNode {
-  const { node, step, onClick, onConfigure, onDelete, showDelete } = data;
+  const { node, step, showDelete } = data;
+  const { handleNodeClick, openConfigDialog, openDeleteDialog } = useNodeDialog();
 
   return (
-    <ConfiguredNode
+    <Node
       id={node.id}
-      onClick={onClick}
-      onConfigure={onConfigure}
-      onDelete={onDelete}
+      onClick={() => handleNodeClick(node)}
+      onConfigure={() => openConfigDialog(node)}
+      onDelete={() => openDeleteDialog(node)}
       showDelete={showDelete}
     >
       <NodeBadge>
@@ -50,6 +49,6 @@ export function SendSmsActionNode({ data }: SendSmsActionNodeProps): ReactNode {
         Send SMS
       </NodeBadge>
       <NodeDescription step={step}>{getSendSmsDescription(node)}</NodeDescription>
-    </ConfiguredNode>
+    </Node>
   );
 }
