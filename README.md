@@ -32,6 +32,7 @@ Project documentation is located in the `/project/` directory:
 
 - `functional-requirement.md` - Complete functional requirements specification
 - `implementation-plan.md` - Implementation plan and architecture
+- `architecture.md` - Application architecture and design patterns
 
 ## Prompts
 
