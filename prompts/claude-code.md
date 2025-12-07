@@ -278,3 +278,17 @@ Okay, now it doesn't work as expected, we forgot one thing. We always want the p
 ```
 
 After some consideration, I decided to not implement task 6.3, which seemed unnecessary and was creating unnecessary clutter in the code.
+
+## Phase 7.
+
+After implementing the phase 6, I moved to the phase 7, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing task 7.1 from phase 7, please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md.
+```
+
+```prompt
+Okay, now please complete task 7.2. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+After this task, there were some in the relevant branches. That is why it was necessary to change the plan a bit after the implementation. Instead of conditionally bringing the successor to the left branch, I decided to always bring it, because there is always some advantage there.

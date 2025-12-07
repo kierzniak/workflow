@@ -33,6 +33,17 @@ type WorkflowAction =
         actionEdgeId: string;
         plusEdgeId: string;
       };
+    }
+  | {
+      type: 'CREATE_IF_ELSE_CHILDREN';
+      payload: {
+        ifElseNodeId: string;
+        existingSuccessorId?: string;
+        pathAAction: ActionNode;
+        pathAPlus: PlusNode;
+        pathBAction: ActionNode;
+        pathBPlus: PlusNode;
+      };
     };
 
 // =============================================================================
@@ -164,6 +175,43 @@ function workflowReducer(state: Workflow, action: WorkflowAction): Workflow {
       return { ...state, nodes: newNodes, edges: newEdges };
     }
 
+    case 'CREATE_IF_ELSE_CHILDREN': {
+      const { ifElseNodeId, existingSuccessorId, pathAAction, pathAPlus, pathBAction, pathBPlus } =
+        action.payload;
+
+      const newNodes = new Map(state.nodes);
+      newNodes.set(pathAAction.id, pathAAction);
+      newNodes.set(pathBAction.id, pathBAction);
+      newNodes.set(pathBPlus.id, pathBPlus);
+
+      let newEdges: WorkflowEdge[];
+
+      if (existingSuccessorId) {
+        // If-else in middle: move existing successor to Path A (no new plus for Path A)
+        newEdges = state.edges.filter(
+          (e) => !(e.source === ifElseNodeId && e.target === existingSuccessorId)
+        );
+        newEdges.push(
+          { id: createEdgeId(), source: ifElseNodeId, target: pathAAction.id },
+          { id: createEdgeId(), source: pathAAction.id, target: existingSuccessorId },
+          { id: createEdgeId(), source: ifElseNodeId, target: pathBAction.id },
+          { id: createEdgeId(), source: pathBAction.id, target: pathBPlus.id }
+        );
+      } else {
+        // If-else at end: both branches get plus nodes
+        newNodes.set(pathAPlus.id, pathAPlus);
+        newEdges = [
+          ...state.edges,
+          { id: createEdgeId(), source: ifElseNodeId, target: pathAAction.id },
+          { id: createEdgeId(), source: pathAAction.id, target: pathAPlus.id },
+          { id: createEdgeId(), source: ifElseNodeId, target: pathBAction.id },
+          { id: createEdgeId(), source: pathBAction.id, target: pathBPlus.id },
+        ];
+      }
+
+      return { ...state, nodes: newNodes, edges: newEdges };
+    }
+
     default: {
       return state;
     }
@@ -201,6 +249,8 @@ export interface UseWorkflowStateReturn {
   setEdges: (edges: WorkflowEdge[]) => void;
   /** Insert action + plus after clicked plus node, returns the new action node */
   insertActionAfterPlus: (plusNodeId: string) => ActionNode;
+  /** Create child nodes (2 actions + 2 plus) for an if-else node */
+  createIfElseChildren: (ifElseNodeId: string) => void;
 }
 
 /**
@@ -259,6 +309,50 @@ export function useWorkflowState(): UseWorkflowStateReturn {
     return actionNode;
   };
 
+  const createIfElseChildren = (ifElseNodeId: string): void => {
+    // Find if if-else has a successor (existing edge from if-else to something)
+    const existingOutgoingEdge = workflow.edges.find((e) => e.source === ifElseNodeId);
+    const existingSuccessorId = existingOutgoingEdge?.target;
+
+    // Create Path A nodes
+    const pathAAction: ActionNode = {
+      id: createNodeId(),
+      type: 'action',
+      name: null,
+      position: { x: 0, y: 0 },
+    };
+    const pathAPlus: PlusNode = {
+      id: createNodeId(),
+      type: 'plus',
+      position: { x: 0, y: 0 },
+    };
+
+    // Create Path B nodes
+    const pathBAction: ActionNode = {
+      id: createNodeId(),
+      type: 'action',
+      name: null,
+      position: { x: 0, y: 0 },
+    };
+    const pathBPlus: PlusNode = {
+      id: createNodeId(),
+      type: 'plus',
+      position: { x: 0, y: 0 },
+    };
+
+    dispatch({
+      type: 'CREATE_IF_ELSE_CHILDREN',
+      payload: {
+        ifElseNodeId,
+        existingSuccessorId,
+        pathAAction,
+        pathAPlus,
+        pathBAction,
+        pathBPlus,
+      },
+    });
+  };
+
   return {
     workflow,
     initializeWorkflow,
@@ -268,5 +362,6 @@ export function useWorkflowState(): UseWorkflowStateReturn {
     replaceNode,
     setEdges,
     insertActionAfterPlus,
+    createIfElseChildren,
   };
 }

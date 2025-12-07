@@ -18,7 +18,7 @@ const CONFIG_FORM_ID = 'node-config-form';
  * Manages node click interactions and dialog state.
  */
 export function WorkflowCanvas(): React.ReactElement {
-  const { workflow, updateNode, insertActionAfterPlus } = useWorkflow();
+  const { workflow, updateNode, insertActionAfterPlus, createIfElseChildren } = useWorkflow();
   const {
     dialogType,
     dialogData,
@@ -63,6 +63,11 @@ export function WorkflowCanvas(): React.ReactElement {
       updateNode(node.id, { name: name as TriggerName });
     } else {
       updateNode(node.id, { name: name as ActionName });
+
+      // Special handling for if-else: create child nodes
+      if (name === 'if-else') {
+        createIfElseChildren(node.id);
+      }
     }
 
     // Open config dialog directly (replaces selection dialog)

@@ -6,6 +6,7 @@ import {
   NODE_WIDTH,
   NODE_HEIGHT,
   PLUS_NODE_SIZE,
+  BRANCH_HORIZONTAL_SPACING,
 } from '@/features/workflow/constants/layout';
 
 /**
@@ -22,11 +23,7 @@ export type NodePositionMap = Map<string, NodePosition>;
 
 /**
  * Calculates positions for all nodes in a workflow based on graph structure.
- *
- * Linear layout:
- * - All nodes centered horizontally at CANVAS_CENTER_X
- * - Nodes stacked vertically with VERTICAL_SPACING between them
- * - Order determined by traversing edges from trigger node
+ * Handles both linear flow and branching (if-else nodes with 2 children).
  *
  * @param workflow - The workflow containing nodes and edges
  * @returns Map of node IDs to calculated positions
@@ -44,13 +41,8 @@ export function calculateNodePositions(workflow: Workflow): NodePositionMap {
     return positions;
   }
 
-  // Traverse graph and assign positions
-  // Track current Y position and previous node height for proper spacing
-  let currentY = CANVAS_START_Y;
-  let previousNodeHeight = 0;
-  let isFirstNode = true;
+  // Start traversal from trigger
   const visited = new Set<string>();
-
   traverseAndPosition(
     triggerNode.id,
     adjacency,
@@ -58,17 +50,7 @@ export function calculateNodePositions(workflow: Workflow): NodePositionMap {
     positions,
     visited,
     CANVAS_CENTER_X,
-    (node: WorkflowNode) => {
-      if (isFirstNode) {
-        isFirstNode = false;
-        previousNodeHeight = getNodeHeight(node);
-        return currentY;
-      }
-      // Next node Y = previous node bottom + gap
-      currentY += previousNodeHeight + VERTICAL_SPACING;
-      previousNodeHeight = getNodeHeight(node);
-      return currentY;
-    }
+    CANVAS_START_Y
   );
 
   return positions;
@@ -103,7 +85,9 @@ function findTriggerNode(nodes: Map<string, WorkflowNode>): WorkflowNode | undef
 
 /**
  * Traverses graph depth-first, assigning positions to nodes.
- * For linear flow, this produces top-to-bottom ordering.
+ * Handles branching by positioning children side-by-side.
+ *
+ * @returns The Y position after this subtree (for calculating next node position)
  */
 function traverseAndPosition(
   nodeId: string,
@@ -111,29 +95,77 @@ function traverseAndPosition(
   nodes: Map<string, WorkflowNode>,
   positions: NodePositionMap,
   visited: Set<string>,
-  x: number,
-  getNextY: (node: WorkflowNode) => number
-): void {
+  centerX: number,
+  startY: number
+): number {
   if (visited.has(nodeId)) {
-    return;
+    return startY;
   }
   visited.add(nodeId);
 
   const node = nodes.get(nodeId);
   if (!node) {
-    return;
+    return startY;
   }
 
-  // Assign position (center plus nodes horizontally relative to content nodes)
-  let xPos = x;
+  // Calculate X position (center plus nodes)
+  const nodeHeight = getNodeHeight(node);
+  let xPos = centerX;
   if (node.type === 'plus') {
-    xPos = x + NODE_WIDTH / 2 - PLUS_NODE_SIZE / 2;
+    xPos = centerX + NODE_WIDTH / 2 - PLUS_NODE_SIZE / 2;
   }
-  positions.set(nodeId, { x: xPos, y: getNextY(node) });
 
-  // Process children (for linear flow, there's at most one)
+  // Assign position
+  positions.set(nodeId, { x: xPos, y: startY });
+
+  // Get children
   const children = adjacency.get(nodeId) ?? [];
-  for (const childId of children) {
-    traverseAndPosition(childId, adjacency, nodes, positions, visited, x, getNextY);
+
+  if (children.length === 0) {
+    // Leaf node - return Y after this node
+    return startY + nodeHeight;
   }
+
+  if (children.length === 1) {
+    // Linear flow - continue with same centerX
+    const nextY = startY + nodeHeight + VERTICAL_SPACING;
+    return traverseAndPosition(children[0], adjacency, nodes, positions, visited, centerX, nextY);
+  }
+
+  // Branching (2+ children) - position side by side
+  // Path A (first child) = left, Path B (second child) = right
+  const branchStartY = startY + nodeHeight + VERTICAL_SPACING;
+  const leftX = centerX - BRANCH_HORIZONTAL_SPACING / 2;
+  const rightX = centerX + BRANCH_HORIZONTAL_SPACING / 2;
+
+  // Process each branch, track max Y reached
+  let maxY = branchStartY;
+
+  // Path A (left branch)
+  const leftEndY = traverseAndPosition(
+    children[0],
+    adjacency,
+    nodes,
+    positions,
+    visited,
+    leftX,
+    branchStartY
+  );
+  maxY = Math.max(maxY, leftEndY);
+
+  // Path B (right branch)
+  if (children.length >= 2) {
+    const rightEndY = traverseAndPosition(
+      children[1],
+      adjacency,
+      nodes,
+      positions,
+      visited,
+      rightX,
+      branchStartY
+    );
+    maxY = Math.max(maxY, rightEndY);
+  }
+
+  return maxY;
 }

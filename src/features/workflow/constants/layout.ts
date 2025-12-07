@@ -22,7 +22,7 @@ export const PLUS_NODE_SIZE = 32;
 export const VERTICAL_SPACING = 48;
 
 /** Horizontal spacing between branch lanes for if-else nodes */
-export const BRANCH_HORIZONTAL_SPACING = 320;
+export const BRANCH_HORIZONTAL_SPACING = 400;
 
 // =============================================================================
 // Starting Positions

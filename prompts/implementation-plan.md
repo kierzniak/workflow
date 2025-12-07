@@ -130,11 +130,3 @@ type Result<T, E = Error> = { ok: true; value: T } | { ok: false; error: E };
 - Don't mix controlled and uncontrolled inputs.
 
 Your generated response **MUST** be in markdown, later I will use this file in my project.
-
-````
-
-The prompt did not provide me with a perfect answer, so I continued the conversation with the chat to enrich the document with values that I consider essential. For example, I asked it to rewrite node naming convention to `type` + `name`. Additionally, I edited the document manually to meet my needs.
-
-```prompt
-We have a somewhat strange setup of these nodes here. We have NodeType and ConcreteTriggerType, ConcreteActionType. I don't like it. Please suggest something different here. I would like to have some basic naming convetion like node type and node name.
-````
