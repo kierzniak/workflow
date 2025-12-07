@@ -178,3 +178,103 @@ Ok I have multiple warnings in console like:
 [warnings from console]
 I think the problem is that we are missing Handles from React Flow. Please, let's add them so that the paths are displayed correctly. Plus icon is not centered with respect to the node and it is not centered with respect to space between nodes. During the calculation of the distances between the nodes, do not take their height into account. Please correct this. Additionally, I would like the zoom to be set to 100% instead of fitView when loading for the first time. We can set fitView with a maximum zoom of 1, then it will solve our problem.
 ```
+
+## Phase 5.
+
+After implementing the phase 4, I moved to the phase 5, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing task 5.1 from phase 5, please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md.
+```
+
+Claude wanted to create a dialogin in our workflow feature. I stopped him and suggested that he should create everything in the shared space instead of our functionality.
+
+```prompt
+ Dialog is quite a generic component, and I believe it should be stored somewhere in a shared accessible place rather than in our workflow. Our workflow will use the dialog, but it shouldn't define it itself. Can what we have already defined, the dialog we have already installed, be sufficient for us? Do we need to define anything additional? If you want to create additional hooks, also create them in shared accessible place.
+```
+
+```prompt
+Okay, now please complete task 5.2. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.3. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.4. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.5. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.6. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.7. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.8. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+Claude proposed a full featured integration with very broad configuration possibilities. I think that for now we don't need this, so I suggested simplifying it significantly.
+
+```prommpt
+I wanted to simplify this a bit. I think that for now we don't need tabs and we don't need to combine conditions, either AND or OR. Let's make it as simple as possible. One condition for A and one condition for B. Let's keep it as simple as we can.
+```
+
+```prompt
+Okay, now please complete task 5.9. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.10. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.11. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+```prompt
+Okay, now please complete task 5.12. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+After the implementation of phase 5, I asked for a few functional changes and a few visual changes.
+
+```prompt
+Few changes:
+- All inputs should be 100% width
+- The single condition in the node if/else should be on one line. Just like it is in the screenshot in Zappier
+- Required fields should have an asterisk after the label
+- After selecting a node from the selector, a new dialog for configuring the selected node should immediately be displayed
+```
+
+After changes, at the end of phase 5, I don't like the structure of the Node directories, so I asked Claude to rewrite it. I had in mind roughly how I want it to look, but I asked him for different options. Before this tasks I cleared context.
+
+```prompt
+Phase 5 is finished, but the folder structure we currently have didn't turn out well for me. When we want to add a new node, a new action, or a new trigger, we have to do it in many places, which goes against the Open-Closed Principle from SOLID. Please suggest how I can rearrange the folder and file structure to address this issue. Let's propose three options.
+```
+
+## Phase 6.
+
+After implementing the phase 5, I moved to the phase 6, where I cleared the context and wrote this prompt.
+
+```prompt
+We want to start implementing task 6.1 from phase 6, please analyze the project, @project/functional-requirement.md and @project/implementation-plan.md. Next, schedule the plan of this task. Please show me sample code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task. When you finish each individual task, please update our @project/implementation-plan.md.
+```
+
+```prompt
+Okay, now please complete task 6.2. Please show me code that we will be implementing, as I may want to make changes to it. Next, schedule the execution of this task.
+```
+
+After the implementation, I realized that I wrote the instructions for Claude a bit incorrectly. Plus node should not be replaced by the new node, but the new node should be added after the plus node to preserve plus icon between nodes.
+
+```prompt
+Okay, now it doesn't work as expected, we forgot one thing. We always want the plus icon to be between the nodes. At this moment, when we click the plus, that node get replaced by action node. But, we should add that node after the clicked plus icon to save plus icon. When the plus icon is the last one, we should add new Node and Plus node.
+```
+
+After some consideration, I decided to not implement task 6.3, which seemed unnecessary and was creating unnecessary clutter in the code.

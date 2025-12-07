@@ -8,13 +8,13 @@ This document outlines a phased implementation plan for building a proof-of-conc
 
 ## 📊 Implementation Status
 
-> **Last Updated:** 2025-12-06
+> **Last Updated:** 2025-12-07
 
-| Metric               | Value                                     |
-| -------------------- | ----------------------------------------- |
-| **Overall Progress** | ~36%                                      |
-| **Current Phase**    | Phase 4 (Node Rendering) - 🔄 In Progress |
-| **Phases Completed** | 3 of 11                                   |
+| Metric               | Value                                            |
+| -------------------- | ------------------------------------------------ |
+| **Overall Progress** | ~47%                                             |
+| **Current Phase**    | Phase 6 (Plus Node Interaction) - 🔄 In Progress |
+| **Phases Completed** | 5 of 11                                          |
 
 ### Phase Status Overview
 
@@ -23,9 +23,9 @@ This document outlines a phased implementation plan for building a proof-of-conc
 | 1. Project Setup         | ✅ Complete    | 100%     |
 | 2. Canvas Foundation     | ✅ Complete    | 100%     |
 | 3. Data Model            | ✅ Complete    | 100%     |
-| 4. Node Rendering        | 🔄 In Progress | 80%      |
-| 5. Configuration Modals  | ⬜ Not Started | 0%       |
-| 6. Plus Node Interaction | ⬜ Not Started | 0%       |
+| 4. Node Rendering        | ✅ Complete    | 100%     |
+| 5. Configuration Modals  | ✅ Complete    | 100%     |
+| 6. Plus Node Interaction | 🔄 In Progress | 50%      |
 | 7. If/Else Branching     | ⬜ Not Started | 0%       |
 | 8. Node Deletion         | ⬜ Not Started | 0%       |
 | 9. Visual Polish         | ⬜ Not Started | 0%       |
@@ -34,13 +34,11 @@ This document outlines a phased implementation plan for building a proof-of-conc
 
 ### Missing Dependencies
 
-The following dependencies from the Technology Stack are **not yet installed**:
-
-- ❌ **Zod** - Required for validation schemas (FR-031)
+All required dependencies are now installed. ✅
 
 ### Installed but Unused
 
-- ⚠️ `react-hook-form` - Installed, not yet used
+- ⚠️ `react-hook-form` - Installed, used in ScheduleConfigForm
 
 ---
 
@@ -715,238 +713,220 @@ All node rendering tasks completed. The workflow canvas now displays:
 
 **Verification:** User can click nodes, select node names, configure settings, and see changes reflected on the canvas.
 
-### Task 5.1: Create Modal Infrastructure
+### Task 5.1: Create Dialog Infrastructure ✅
 
-- [ ] Create `Modal` wrapper component using ShadCN Dialog
-- [ ] Implement modal state management hook (`useModal`)
-- [ ] Support modal stacking prevention (only one modal open)
-- [ ] Add focus trap and escape key handling (FR-029, FR-030)
-- [ ] Create modal header with title and close button
+- [x] Use existing ShadCN Dialog component (focus trap, escape, outside click already handled)
+- [x] Implement dialog state management hook (`useDialog`) at `src/hooks/use-dialog.ts`
+- [x] Support dialog stacking prevention (only one dialog open via `useDialog` hook)
+- [x] Generic hook with `<TType, TData>` type parameters for reusability
 
 **Acceptance Criteria:**
 
-- Only one modal can be open at a time
-- Focus is trapped within modal
-- Escape key closes modal
-- Clicking outside closes modal (configurable)
+- ✅ Only one dialog can be open at a time (enforced by `useDialog` hook)
+- ✅ Focus is trapped within dialog (Radix Dialog default)
+- ✅ Escape key closes dialog (Radix Dialog default)
+- ✅ Clicking outside closes dialog (Radix Dialog default)
 
 ---
 
-### Task 5.2: Define Node Catalog
+### Task 5.2: Define Node Catalog ✅
 
-- [ ] Create `src/features/workflow/constants/node-catalog.ts`
-- [ ] Define `NodeCatalogEntry` interface:
-  ```typescript
-  interface NodeCatalogEntry {
-    name: TriggerName | ActionName;
-    label: string;
-    description: string;
-    icon: ReactNode;
-    type: 'trigger' | 'action';
-  }
-  ```
-- [ ] Add catalog entries:
-  - `{ name: 'schedule', type: 'trigger', label: 'Schedule', ... }`
-  - `{ name: 'send-email', type: 'action', label: 'Send Email', ... }`
-  - `{ name: 'if-else', type: 'action', label: 'If/Else', ... }`
-- [ ] Export helper function to filter by type:
-  ```typescript
-  function getNodeCatalogByType(type: 'trigger' | 'action'): NodeCatalogEntry[];
-  ```
+- [x] Create `src/features/workflow/constants/node-catalog.ts`
+- [x] Define `NodeCatalogEntry` interface with name, label, description, icon, type
+- [x] Add catalog entries:
+  - `{ name: 'schedule', type: 'trigger', label: 'Schedule', icon: Calendar }`
+  - `{ name: 'send-email', type: 'action', label: 'Send Email', icon: Mail }`
+  - `{ name: 'if-else', type: 'action', label: 'If/Else', icon: GitBranch }`
+- [x] Export helper functions:
+  - `getNodeCatalogByType(type)` - filter by trigger/action
+  - `getNodeCatalogEntry(name)` - lookup single entry
+- [x] Create `src/features/workflow/constants/index.ts` barrel export
 
 **Acceptance Criteria:**
 
-- Catalog uses `name` for node identification
-- Each entry has complete information
-- Filter function returns correct entries by type
+- ✅ Catalog uses `name` for node identification (matches `TriggerName | ActionName`)
+- ✅ Each entry has complete information
+- ✅ Filter function returns correct entries by type
 
 ---
 
-### Task 5.3: Create Node Selection Modal (FR-014, FR-015, FR-016)
+### Task 5.3: Create Node Selection Dialog (FR-014, FR-015, FR-016) ✅
 
-- [ ] Create `NodeSelectionModal` component
-- [ ] Accept `nodeType` prop to filter catalog (`'trigger' | 'action'`)
-- [ ] Display filtered catalog entries as selectable list
-- [ ] Show icon, label, and description for each entry
-- [ ] Add search/filter input (optional for PoC)
-- [ ] Handle selection: emit chosen `name` value
-- [ ] Handle cancellation: close without selection
+- [x] Create `NodeSelectionDialog` component at `src/features/workflow/components/NodeSelectionDialog.tsx`
+- [x] Accept `nodeType` prop to filter catalog (`'trigger' | 'action'`)
+- [x] Display filtered catalog entries as selectable list
+- [x] Show icon, label, and description for each entry
+- [x] Handle selection: emit chosen `name` value via `onSelect` callback
+- [x] Handle cancellation: close without selection (X, Escape, outside click)
 
 **Acceptance Criteria:**
 
-- Trigger nodes only see trigger options (schedule)
-- Action nodes only see action options (send-email, if-else)
-- Selection emits the `name` value (e.g., 'schedule', 'send-email')
-- Cancel returns without selection
+- ✅ Trigger nodes only see trigger options (schedule)
+- ✅ Action nodes only see action options (send-email, if-else)
+- ✅ Selection emits the `name` value (e.g., 'schedule', 'send-email')
+- ✅ Cancel returns without selection
 
 ---
 
-### Task 5.4: Create Node Configuration Modal Shell
+### Task 5.4: Create Node Configuration Dialog Shell ✅
 
-- [ ] Create `NodeConfigurationModal` component
-- [ ] Accept `node` prop with current node data
-- [ ] Display node name in modal header
-- [ ] Create form container for configuration fields
-- [ ] Add Save and Cancel buttons in footer
-- [ ] Handle form submission and cancellation
+- [x] Create `NodeConfigurationDialog` component at `src/features/workflow/components/NodeConfigurationDialog.tsx`
+- [x] Accept `node` prop with current node data (`ConfigurableNode` = TriggerNode | ActionNode)
+- [x] Display node icon, label, and description in header (from catalog)
+- [x] Create form container via `children` prop for configuration fields
+- [x] Add Save and Cancel buttons in footer
+- [x] Handle form submission (`onSave`) and cancellation (`onOpenChange`)
 
 **Acceptance Criteria:**
 
-- Modal displays for any configured/unconfigured node
-- Header shows appropriate node name
-- Footer buttons are consistently positioned
+- ✅ Dialog displays for any configured/unconfigured node
+- ✅ Header shows node icon, label, and description from catalog
+- ✅ Footer buttons are consistently positioned
 
 ---
 
-### Task 5.5: Define Configuration Schemas with Zod
+### Task 5.5: Define Configuration Schemas with Zod ✅
 
-- [ ] Create `src/features/workflow/schemas/` directory
-- [ ] Define `scheduleConfigSchema`:
-  - `frequency: 'daily' | 'hourly' | 'weekly' | 'monthly'`
-  - `timeOfDay: string` (HH:mm format)
-  - `timezone: string`
-  - `dayOfWeek?: number` (for weekly)
-- [ ] Define `sendEmailConfigSchema`:
-  - `to: string` (email format)
-  - `subject: string` (required)
-  - `body: string` (required)
-  - `fromName?: string`
-- [ ] Define `ifElseConfigSchema`:
-  - `pathAConditions: ConditionGroup`
-  - `pathBConditions: ConditionGroup`
-- [ ] Export schemas and inferred types
+- [x] Install Zod (`pnpm add zod`)
+- [x] Create `src/features/workflow/schemas/schedule-config.ts`:
+  - frequency, timeOfDay (HH:mm regex), timezone, dayOfWeek (required for weekly via refine)
+- [x] Create `src/features/workflow/schemas/send-email-config.ts`:
+  - to (email), subject, body, fromName (optional)
+- [x] Create `src/features/workflow/schemas/if-else-config.ts`:
+  - comparisonOperatorSchema, conditionSchema, conditionGroupSchema, ifElseConfigSchema
+- [x] Create `src/features/workflow/schemas/index.ts` - barrel export
+- [x] Export schemas and inferred types (`z.input`/`z.output`)
 
 **Acceptance Criteria:**
 
-- All schemas validate correctly
-- Type inference works from schemas
-- Error messages are user-friendly
+- ✅ All schemas validate correctly
+- ✅ Type inference works from schemas
+- ✅ Error messages are user-friendly
 
 ---
 
-### Task 5.6: Create Schedule Trigger Configuration Form (FR-017, FR-018)
+### Task 5.6: Create Schedule Trigger Configuration Form (FR-017, FR-018) ✅
 
-- [ ] Create `ScheduleConfigForm` component
-- [ ] Add frequency select field (daily, hourly, weekly, monthly)
-- [ ] Add time of day picker field
-- [ ] Add timezone select field
-- [ ] Add conditional day of week field (shows for weekly)
-- [ ] Integrate with Zod validation
-- [ ] Use ShadCN form components (Input, Select, Label)
+- [x] Create `ScheduleConfigForm` component at `src/features/workflow/components/forms/ScheduleConfigForm.tsx`
+- [x] Add frequency select field (daily, hourly, weekly, monthly)
+- [x] Add time of day picker field (HTML5 time input)
+- [x] Add timezone select field (13 common timezones)
+- [x] Add conditional day of week field (shows for weekly)
+- [x] Integrate with Zod validation via `@hookform/resolvers`
+- [x] Use ShadCN form components (Input, Select, Field)
+- [x] Install ShadCN Select component
+- [x] Create `forms/` directory with barrel export
 
 **Acceptance Criteria:**
 
-- All fields render correctly
-- Validation errors display inline
-- Conditional fields show/hide based on frequency
+- ✅ All fields render correctly
+- ✅ Validation errors display inline via FieldError
+- ✅ Conditional fields show/hide based on frequency
 
 ---
 
-### Task 5.7: Create Send Email Configuration Form (FR-017, FR-018)
+### Task 5.7: Create Send Email Configuration Form (FR-017, FR-018) ✅
 
-- [ ] Create `SendEmailConfigForm` component
-- [ ] Add "To" email input with validation
-- [ ] Add "Subject" text input
-- [ ] Add "Body" textarea
-- [ ] Add "From Name" optional input
-- [ ] Integrate with Zod validation
-- [ ] Show validation errors inline
+- [x] Create `SendEmailConfigForm` component at `src/features/workflow/components/forms/SendEmailConfigForm.tsx`
+- [x] Add "To" email input with validation
+- [x] Add "Subject" text input
+- [x] Add "Body" textarea
+- [x] Add "From Name" optional input
+- [x] Integrate with Zod validation via `@hookform/resolvers`
+- [x] Show validation errors inline via FieldError
 
 **Acceptance Criteria:**
 
-- Email field validates format
-- Required fields show error when empty
-- Form is accessible with proper labels
+- ✅ Email field validates format
+- ✅ Required fields show error when empty
+- ✅ Form is accessible with proper labels
 
 ---
 
-### Task 5.8: Create If/Else Configuration Form (FR-018a, FR-018b)
+### Task 5.8: Create If/Else Configuration Form (FR-018a, FR-018b) ✅
 
-- [ ] Create `IfElseConfigForm` component
-- [ ] Create tabbed interface for Path A / Path B conditions
-- [ ] Create `ConditionRow` subcomponent:
-  - Value source dropdown (mock data from previous nodes)
-  - Operator dropdown (equals, not equals, greater than, contains, etc.)
-  - Comparison value input
-- [ ] Support adding/removing condition rows
-- [ ] Support AND logic within each path
-- [ ] Integrate with Zod validation
+> **Simplified:** One condition per path instead of multiple conditions with AND logic.
+
+- [x] Simplify schema to single condition per path (`pathACondition`, `pathBCondition`)
+- [x] Create `IfElseConfigForm` component at `src/features/workflow/components/forms/IfElseConfigForm.tsx`
+- [x] Display Path A and Path B sections with separator (no tabs)
+- [x] Each path has: Source, Field, Operator, Value fields
+- [x] Integrate with Zod validation via `@hookform/resolvers`
+- [x] Update `IfElseConfig` type in `types/workflow.ts`
+- [x] Update type exports (removed `ConditionGroup`)
 
 **Acceptance Criteria:**
 
-- Both paths are configurable independently
-- Conditions can be added and removed
-- Validation ensures at least one condition per path
+- ✅ Both paths configurable with one condition each
+- ✅ Field dropdown depends on selected source node
+- ✅ Validation errors display inline
 
 ---
 
-### Task 5.9: Implement Node Click Handler
+### Task 5.9: Implement Node Click Handler ✅
 
-- [ ] Add `onNodeClick` callback to Canvas component
-- [ ] Create `useNodeInteraction` hook to manage:
-  - Currently selected node
-  - Modal open state
-  - Modal type (selection vs configuration)
-- [ ] Determine modal type based on node state:
-  - `name: null` → Selection modal first
-  - `name: NodeName` → Configuration modal directly
-- [ ] Handle click events from custom node components
+- [x] Canvas already has `onNodeClick` callback (reused existing)
+- [x] Create `useNodeInteraction` hook at `src/features/workflow/hooks/use-node-interaction.ts`
+- [x] Hook manages: dialogType, dialogData, handleNodeClick, closeDialog, openConfigDialog
+- [x] Determine dialog type based on node state:
+  - `name: null` → NodeSelectionDialog
+  - `name: NodeName` → NodeConfigurationDialog
+- [x] Wire up dialogs in `page.tsx` with stub handlers
+- [x] Pass click handlers via `workflowToCanvasNodes` callbacks
 
 **Acceptance Criteria:**
 
-- Clicking node with `name: null` opens selection modal
-- Clicking node with `name` set opens configuration modal
-- Modal state is managed centrally
+- ✅ Clicking node with `name: null` opens selection dialog
+- ✅ Clicking node with `name` set opens configuration dialog
+- ✅ Dialog state managed via `useNodeInteraction` hook
 
 ---
 
-### Task 5.10: Implement Node Selection Flow
+### Task 5.10: Implement Node Selection Flow ✅
 
-- [ ] Wire `NodeSelectionModal` to node click for unconfigured nodes (`name: null`)
-- [ ] On selection: update node with selected `name`
-- [ ] On selection: immediately open configuration modal
-- [ ] On cancel: revert any placeholder state
-- [ ] Update workflow state via dispatch
+- [x] Wire `NodeSelectionModal` to node click for unconfigured nodes (`name: null`)
+- [x] On selection: update node with selected `name`
+- [x] On selection: immediately open configuration modal
+- [x] On cancel: dialog closes, node remains with `name: null`
+- [x] Update workflow state via dispatch
 
 **Acceptance Criteria:**
 
-- Selecting a name (e.g., 'schedule') updates node's `name` field
-- Configuration modal opens after selection
-- Cancellation leaves node with `name: null`
+- ✅ Selecting a name (e.g., 'schedule') updates node's `name` field
+- ✅ Configuration modal opens after selection
+- ✅ Cancellation leaves node with `name: null`
 
 ---
 
-### Task 5.11: Implement Node Configuration Save (FR-019)
+### Task 5.11: Implement Node Configuration Save (FR-019) ✅
 
-- [ ] Validate form data with Zod schema on save
-- [ ] If valid: update node config in workflow state
-- [ ] If valid: mark node as 'configured'
-- [ ] If valid: close modal
-- [ ] If invalid: show errors, keep modal open
-- [ ] Update node visual appearance to reflect configured state
+- [x] Validate form data with Zod schema on save (via react-hook-form + zodResolver)
+- [x] If valid: update node config in workflow state
+- [x] If valid: close modal
+- [x] If invalid: show errors, keep modal open
+- [x] Render appropriate form based on node.name (schedule, send-email, if-else)
 
 **Acceptance Criteria:**
 
-- Valid configuration saves and closes modal
-- Invalid configuration shows errors
-- Node displays configured state visually
+- ✅ Valid configuration saves and closes modal
+- ✅ Invalid configuration shows errors
+- ✅ Node config saved to workflow state
 
 ---
 
-### Task 5.12: Implement Modal Cancel Behavior (FR-020)
+### Task 5.12: Implement Modal Cancel Behavior (FR-020) ✅
 
-- [ ] Cancel button closes modal without saving
-- [ ] X button closes modal without saving
-- [ ] Clicking outside closes modal without saving
-- [ ] Escape key closes modal without saving
-- [ ] Unsaved changes are discarded
-- [ ] Add confirmation dialog if changes detected (optional)
+- [x] Cancel button closes modal without saving
+- [x] X button closes modal without saving
+- [x] Clicking outside closes modal without saving
+- [x] Escape key closes modal without saving
+- [x] Unsaved changes are discarded
 
 **Acceptance Criteria:**
 
-- All close methods work consistently
-- No partial saves occur
-- Original state preserved on cancel
+- ✅ All close methods work consistently (via Radix Dialog defaults)
+- ✅ No partial saves occur
+- ✅ Original state preserved on cancel
 
 ---
 
@@ -956,37 +936,36 @@ All node rendering tasks completed. The workflow canvas now displays:
 
 **Verification:** User can click a Plus node, select a node type, configure it, and see the new node appear in the workflow.
 
-### Task 6.1: Implement Plus Node Click Handler (FR-014)
+### Task 6.1: Implement Plus Node Click Handler (FR-014) ✅
 
-- [ ] Add click handler to `PlusNode` component
-- [ ] On click: replace Plus node with Placeholder node
-- [ ] On click: open Node Selection modal (actions only)
-- [ ] Update workflow state to reflect placeholder
-- [ ] Store reference to original Plus node position
+- [x] Add click handler to `PlusNode` component
+- [x] On click: replace Plus node with Placeholder node (unconfigured action)
+- [x] On click: open Node Selection modal (actions only)
+- [x] Update workflow state to reflect placeholder
 
 **Acceptance Criteria:**
 
-- Plus node transforms to placeholder on click
-- Selection modal opens automatically
-- Placeholder appears in correct position
+- ✅ Plus node transforms to placeholder on click
+- ✅ Selection modal opens automatically
+- ✅ Placeholder appears in correct position
 
 ---
 
-### Task 6.2: Implement Node Insertion Logic
+### Task 6.2: Implement Node Insertion Logic ✅
 
-- [ ] Create `insertNodeAfter` function in workflow reducer
-- [ ] Handle insertion in linear section:
-  - Create new Action node at Plus position
-  - Create new Plus node below new Action
-  - Update edges to maintain connectivity
-- [ ] Recalculate positions for all affected nodes
-- [ ] Maintain Plus node placement rules (FR-013)
+- [x] Create `INSERT_PLUS_AFTER_NODE` reducer action in workflow state
+- [x] Handle insertion in linear section:
+  - Plus node converted to Action (Task 6.1)
+  - New Plus node inserted after new Action
+  - Edges updated: Action → NewPlus → Successor
+- [x] Positions recalculated automatically by `calculateNodePositions` on render
+- [x] Plus node placement rules maintained (FR-013)
 
 **Acceptance Criteria:**
 
-- New node inserts at correct position
-- Plus nodes remain between all consecutive nodes
-- Edges reconnect correctly
+- ✅ New node inserts at correct position
+- ✅ Plus nodes remain between all consecutive nodes
+- ✅ Edges reconnect correctly
 
 ---
 
@@ -1004,20 +983,6 @@ All node rendering tasks completed. The workflow canvas now displays:
 - Cancellation fully reverts state
 - No console errors or warnings
 - UI returns to pre-click state
-
----
-
-### Task 6.4: Test Node Addition Flow End-to-End
-
-- [ ] Verify clicking Plus between Trigger and Action:
-  - Placeholder appears
-  - Selection modal opens
-  - Selecting "Send Email" creates Action node
-  - Configuration modal opens
-  - Saving configuration updates node
-  - New Plus nodes appear correctly
-- [ ] Verify clicking Plus at end of flow
-- [ ] Verify multiple sequential additions
 
 **Acceptance Criteria:**
 

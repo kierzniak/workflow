@@ -6,7 +6,9 @@ import type {
   WorkflowEdge,
   TriggerNode,
   ActionNode,
+  PlusNode,
 } from '@/features/workflow/types';
+import { createNodeId, createEdgeId } from '@/features/workflow/types';
 
 // =============================================================================
 // Action Types
@@ -21,7 +23,17 @@ type WorkflowAction =
     }
   | { type: 'DELETE_NODE'; payload: { id: string } }
   | { type: 'REPLACE_NODE'; payload: { oldId: string; newNode: WorkflowNode } }
-  | { type: 'SET_EDGES'; payload: WorkflowEdge[] };
+  | { type: 'SET_EDGES'; payload: WorkflowEdge[] }
+  | {
+      type: 'INSERT_ACTION_AFTER_PLUS';
+      payload: {
+        plusNodeId: string;
+        actionNode: ActionNode;
+        newPlusNode: PlusNode;
+        actionEdgeId: string;
+        plusEdgeId: string;
+      };
+    };
 
 // =============================================================================
 // Reducer
@@ -110,6 +122,48 @@ function workflowReducer(state: Workflow, action: WorkflowAction): Workflow {
       };
     }
 
+    case 'INSERT_ACTION_AFTER_PLUS': {
+      const { plusNodeId, actionNode, newPlusNode, actionEdgeId, plusEdgeId } = action.payload;
+
+      // Find edge: plusNode → successor
+      const outgoingEdgeIndex = state.edges.findIndex((e) => e.source === plusNodeId);
+
+      const newNodes = new Map(state.nodes);
+      newNodes.set(actionNode.id, actionNode);
+      newNodes.set(newPlusNode.id, newPlusNode);
+
+      let newEdges: WorkflowEdge[];
+
+      if (outgoingEdgeIndex === -1) {
+        // Plus is at end of flow
+        // Add: Plus → Action → NewPlus
+        newEdges = [
+          ...state.edges,
+          { id: actionEdgeId, source: plusNodeId, target: actionNode.id },
+          { id: plusEdgeId, source: actionNode.id, target: newPlusNode.id },
+        ];
+      } else {
+        // Plus has successor
+        const successorId = state.edges[outgoingEdgeIndex].target;
+
+        // Change: Plus → Action (was Plus → Successor)
+        // Add: Action → NewPlus → Successor
+        newEdges = state.edges.map((edge, index) => {
+          if (index === outgoingEdgeIndex) {
+            return { ...edge, target: actionNode.id };
+          }
+          return edge;
+        });
+
+        newEdges.push(
+          { id: actionEdgeId, source: actionNode.id, target: newPlusNode.id },
+          { id: plusEdgeId, source: newPlusNode.id, target: successorId }
+        );
+      }
+
+      return { ...state, nodes: newNodes, edges: newEdges };
+    }
+
     default: {
       return state;
     }
@@ -145,6 +199,8 @@ export interface UseWorkflowStateReturn {
   replaceNode: (oldId: string, newNode: WorkflowNode) => void;
   /** Replace all edges */
   setEdges: (edges: WorkflowEdge[]) => void;
+  /** Insert action + plus after clicked plus node, returns the new action node */
+  insertActionAfterPlus: (plusNodeId: string) => ActionNode;
 }
 
 /**
@@ -178,6 +234,31 @@ export function useWorkflowState(): UseWorkflowStateReturn {
     dispatch({ type: 'SET_EDGES', payload: edges });
   };
 
+  const insertActionAfterPlus = (plusNodeId: string): ActionNode => {
+    const actionNode: ActionNode = {
+      id: createNodeId(),
+      type: 'action',
+      name: null,
+      position: { x: 0, y: 0 }, // Will be recalculated by calculateNodePositions
+    };
+    const newPlusNode: PlusNode = {
+      id: createNodeId(),
+      type: 'plus',
+      position: { x: 0, y: 0 },
+    };
+    dispatch({
+      type: 'INSERT_ACTION_AFTER_PLUS',
+      payload: {
+        plusNodeId,
+        actionNode,
+        newPlusNode,
+        actionEdgeId: createEdgeId(),
+        plusEdgeId: createEdgeId(),
+      },
+    });
+    return actionNode;
+  };
+
   return {
     workflow,
     initializeWorkflow,
@@ -186,5 +267,6 @@ export function useWorkflowState(): UseWorkflowStateReturn {
     deleteNode,
     replaceNode,
     setEdges,
+    insertActionAfterPlus,
   };
 }

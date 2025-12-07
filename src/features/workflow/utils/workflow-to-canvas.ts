@@ -5,12 +5,16 @@ import type {
   PlaceholderNode,
   PlusNode,
   TriggerNode,
+  Workflow,
   WorkflowEdge,
   WorkflowNode,
 } from '../types';
+import { calculateNodePositions } from './calculate-node-positions';
 
 /**
  * Data passed to PlaceholderNode component.
+ * Note: When rendering unconfigured trigger/action as placeholder,
+ * we pass a synthetic PlaceholderNode for display purposes.
  */
 interface PlaceholderNodeData extends CanvasNodeData {
   node: PlaceholderNode;
@@ -98,6 +102,7 @@ function transformNode(
   callbacks?: {
     onClick?: (nodeId: string) => void;
     onMenuClick?: (nodeId: string) => void;
+    onPlusClick?: (nodeId: string) => void;
   }
 ): CanvasNode<WorkflowCanvasNodeData> {
   const nodeType = getNodeType(node);
@@ -109,7 +114,8 @@ function transformNode(
   let data: WorkflowCanvasNodeData;
 
   if (node.type === 'plus') {
-    data = { node, onClick };
+    const plusClick = callbacks?.onPlusClick ? () => callbacks.onPlusClick!(node.id) : undefined;
+    data = { node, onClick: plusClick };
   } else if (node.type === 'placeholder') {
     data = { node, step, onClick };
   } else if (node.type === 'trigger') {
@@ -151,9 +157,11 @@ function transformNode(
 
 /**
  * Transform workflow nodes to canvas nodes for React Flow.
+ * Recalculates positions from graph structure to ensure correct layout.
  *
  * @param nodes - Map of workflow nodes
  * @param callbacks - Optional click handlers
+ * @param workflow - Full workflow for position calculation
  * @returns Array of canvas nodes ready for React Flow
  */
 export function workflowToCanvasNodes(
@@ -161,10 +169,20 @@ export function workflowToCanvasNodes(
   callbacks?: {
     onClick?: (nodeId: string) => void;
     onMenuClick?: (nodeId: string) => void;
-  }
+    onPlusClick?: (nodeId: string) => void;
+  },
+  workflow?: Workflow
 ): CanvasNode<WorkflowCanvasNodeData>[] {
+  // Recalculate positions from graph structure
+  const positions = workflow ? calculateNodePositions(workflow) : new Map();
+
   const nodeArray = Array.from(nodes.values());
-  return nodeArray.map((node) => transformNode(node, nodeArray, callbacks));
+  return nodeArray.map((node) => {
+    // Apply calculated position or use stored position as fallback
+    const position = positions.get(node.id) ?? node.position;
+    const nodeWithPosition = { ...node, position };
+    return transformNode(nodeWithPosition, nodeArray, callbacks);
+  });
 }
 
 /**
