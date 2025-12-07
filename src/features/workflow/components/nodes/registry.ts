@@ -3,6 +3,8 @@ import type { NodeTypes } from '@xyflow/react';
 import { ifElseDefinition } from './if-else';
 import { scheduleDefinition } from './schedule';
 import { sendEmailDefinition } from './send-email';
+import { sendSmsDefinition } from './send-sms';
+import { webhookDefinition } from './webhook';
 import { PlaceholderNode } from './PlaceholderNode';
 import { PlusNode } from './PlusNode';
 import type { NodeCatalogEntry } from './types';
@@ -13,7 +15,9 @@ import type { NodeCatalogEntry } from './types';
  */
 export const NODE_DEFINITIONS = [
   scheduleDefinition,
+  webhookDefinition,
   sendEmailDefinition,
+  sendSmsDefinition,
   ifElseDefinition,
 ] as const;
 

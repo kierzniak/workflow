@@ -21,7 +21,9 @@ export { isActionName, isTriggerName } from '../components/nodes/registry';
 
 // Configuration types - from individual node modules
 export type { ScheduleConfig } from '../components/nodes/schedule';
+export type { WebhookConfig } from '../components/nodes/webhook';
 export type { SendEmailConfig } from '../components/nodes/send-email';
+export type { SendSmsConfig } from '../components/nodes/send-sms';
 export type {
   ComparisonOperator,
   Condition,
@@ -31,14 +33,21 @@ export type {
 
 // Import for local use
 import type { ScheduleConfig } from '../components/nodes/schedule';
+import type { WebhookConfig } from '../components/nodes/webhook';
 import type { SendEmailConfig } from '../components/nodes/send-email';
+import type { SendSmsConfig } from '../components/nodes/send-sms';
 import type { IfElseConfig } from '../components/nodes/if-else';
 import type { ActionName, TriggerName } from '../components/nodes/registry';
 
 /**
  * Union of all node configurations.
  */
-export type NodeConfig = ScheduleConfig | SendEmailConfig | IfElseConfig;
+export type NodeConfig =
+  | ScheduleConfig
+  | WebhookConfig
+  | SendEmailConfig
+  | SendSmsConfig
+  | IfElseConfig;
 
 // =============================================================================
 // Config Type Guards
@@ -52,10 +61,24 @@ export function isScheduleConfig(config: NodeConfig): config is ScheduleConfig {
 }
 
 /**
+ * Check if config is WebhookConfig.
+ */
+export function isWebhookConfig(config: NodeConfig): config is WebhookConfig {
+  return 'method' in config && !('phoneNumber' in config);
+}
+
+/**
  * Check if config is SendEmailConfig.
  */
 export function isSendEmailConfig(config: NodeConfig): config is SendEmailConfig {
   return 'to' in config && 'subject' in config && 'body' in config;
+}
+
+/**
+ * Check if config is SendSmsConfig.
+ */
+export function isSendSmsConfig(config: NodeConfig): config is SendSmsConfig {
+  return 'phoneNumber' in config && 'message' in config;
 }
 
 /**
@@ -102,7 +125,7 @@ export interface TriggerNode extends BaseNode {
   /** Concrete trigger implementation (null = unconfigured) */
   name: TriggerName | null;
   /** Configuration for the selected trigger type */
-  config?: ScheduleConfig;
+  config?: ScheduleConfig | WebhookConfig;
 }
 
 /**
@@ -114,7 +137,7 @@ export interface ActionNode extends BaseNode {
   /** Concrete action implementation (null = unconfigured) */
   name: ActionName | null;
   /** Configuration for the selected action type */
-  config?: SendEmailConfig | IfElseConfig;
+  config?: SendEmailConfig | SendSmsConfig | IfElseConfig;
 }
 
 /**

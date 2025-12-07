@@ -33,7 +33,7 @@ const FREQUENCY_LABELS: Record<string, string> = {
  * Get description text for schedule trigger.
  */
 function getScheduleDescription(node: TriggerNodeType): string {
-  if (node.name === 'schedule' && node.config) {
+  if (node.name === 'schedule' && node.config && 'frequency' in node.config) {
     return FREQUENCY_LABELS[node.config.frequency] ?? 'Scheduled';
   }
   return 'Configure schedule';
