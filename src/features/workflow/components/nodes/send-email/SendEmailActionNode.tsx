@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 
 import type { ActionNode as ActionNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from './ConfiguredNode';
+import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
 
 /**
  * Props for SendEmailActionNode component (React Flow custom node).

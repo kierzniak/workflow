@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 
 import type { ActionNode as ActionNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from './ConfiguredNode';
+import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
 
 /**
  * Props for IfElseActionNode component (React Flow custom node).
@@ -18,14 +18,25 @@ export interface IfElseActionNodeProps {
   };
 }
 
+/** Human-readable operator labels */
+const OPERATOR_LABELS: Record<string, string> = {
+  equals: '=',
+  'not-equals': '≠',
+  'greater-than': '>',
+  'less-than': '<',
+  contains: 'contains',
+  'not-contains': '!contains',
+};
+
 /**
  * Get description text for if/else action.
+ * Displays condition on one line: "Field operator value"
  */
 function getIfElseDescription(node: ActionNodeType): string {
-  if (node.name === 'if-else' && node.config && 'pathAConditions' in node.config) {
-    const conditionCount =
-      node.config.pathAConditions.conditions.length + node.config.pathBConditions.conditions.length;
-    return `${conditionCount} condition${conditionCount !== 1 ? 's' : ''} configured`;
+  if (node.name === 'if-else' && node.config && 'pathACondition' in node.config) {
+    const { pathACondition } = node.config;
+    const operator = OPERATOR_LABELS[pathACondition.operator] ?? pathACondition.operator;
+    return `${pathACondition.sourceField} ${operator} ${pathACondition.value}`;
   }
   return 'Configure conditions';
 }

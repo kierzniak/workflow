@@ -10,7 +10,6 @@ export type {
   ComparisonOperator,
   ConditionValue,
   Condition,
-  ConditionGroup,
   IfElseConfig,
   NodeConfig,
   // Node data structures

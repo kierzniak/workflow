@@ -12,107 +12,28 @@
 export type NodeType = 'trigger' | 'action' | 'plus' | 'placeholder';
 
 // =============================================================================
-// Node Name (concrete implementations)
+// Re-export types from node definitions
 // =============================================================================
 
-/**
- * Concrete trigger implementations.
- * Triggers start workflow execution based on events/schedules.
- */
-export type TriggerName = 'schedule';
+// Node name types - derived from registry
+export type { ActionName, NodeName, TriggerName } from '../components/nodes/registry';
+export { isActionName, isTriggerName } from '../components/nodes/registry';
 
-/**
- * Concrete action implementations.
- * Actions perform operations within the workflow.
- */
-export type ActionName = 'send-email' | 'if-else';
+// Configuration types - from individual node modules
+export type { ScheduleConfig } from '../components/nodes/schedule';
+export type { SendEmailConfig } from '../components/nodes/send-email';
+export type {
+  ComparisonOperator,
+  Condition,
+  ConditionValue,
+  IfElseConfig,
+} from '../components/nodes/if-else';
 
-/**
- * All concrete node names.
- * A node with name=null is unconfigured; name set = configured.
- */
-export type NodeName = TriggerName | ActionName;
-
-// =============================================================================
-// Configuration Types (per concrete node)
-// =============================================================================
-
-/**
- * Schedule trigger configuration.
- */
-export interface ScheduleConfig {
-  /** How often the trigger fires */
-  frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
-  /** Time of day in HH:mm format (24-hour) */
-  timeOfDay: string;
-  /** IANA timezone identifier (e.g., "America/New_York") */
-  timezone: string;
-  /** Day of week for weekly frequency (1=Monday, 7=Sunday, ISO 8601) */
-  dayOfWeek?: number;
-}
-
-/**
- * Send email action configuration.
- */
-export interface SendEmailConfig {
-  /** Recipient email address */
-  to: string;
-  /** Email subject line */
-  subject: string;
-  /** Email body content */
-  body: string;
-  /** Sender display name (optional) */
-  fromName?: string;
-}
-
-/**
- * Comparison operators for if-else conditions.
- */
-export type ComparisonOperator =
-  | 'equals'
-  | 'not-equals'
-  | 'greater-than'
-  | 'less-than'
-  | 'contains'
-  | 'not-contains';
-
-/**
- * Supported value types for condition comparisons.
- */
-export type ConditionValue = string | number | boolean;
-
-/**
- * Single condition in an if-else branch.
- */
-export interface Condition {
-  /** Unique identifier for this condition */
-  id: string;
-  /** ID of the node providing the source value */
-  sourceNodeId: string;
-  /** Field/property name from the source node */
-  sourceField: string;
-  /** Comparison operator */
-  operator: ComparisonOperator;
-  /** Value to compare against */
-  value: ConditionValue;
-}
-
-/**
- * Group of conditions for a branch (AND logic).
- */
-export interface ConditionGroup {
-  conditions: Condition[];
-}
-
-/**
- * If/Else action configuration with two condition groups.
- */
-export interface IfElseConfig {
-  /** Conditions for Path A (evaluated with AND logic) */
-  pathAConditions: ConditionGroup;
-  /** Conditions for Path B (evaluated with AND logic) */
-  pathBConditions: ConditionGroup;
-}
+// Import for local use
+import type { ScheduleConfig } from '../components/nodes/schedule';
+import type { SendEmailConfig } from '../components/nodes/send-email';
+import type { IfElseConfig } from '../components/nodes/if-else';
+import type { ActionName, TriggerName } from '../components/nodes/registry';
 
 /**
  * Union of all node configurations.
@@ -120,22 +41,8 @@ export interface IfElseConfig {
 export type NodeConfig = ScheduleConfig | SendEmailConfig | IfElseConfig;
 
 // =============================================================================
-// Type Guards
+// Config Type Guards
 // =============================================================================
-
-/**
- * Check if a name is a trigger name.
- */
-export function isTriggerName(name: NodeName): name is TriggerName {
-  return name === 'schedule';
-}
-
-/**
- * Check if a name is an action name.
- */
-export function isActionName(name: NodeName): name is ActionName {
-  return name === 'send-email' || name === 'if-else';
-}
 
 /**
  * Check if config is ScheduleConfig.
@@ -155,7 +62,7 @@ export function isSendEmailConfig(config: NodeConfig): config is SendEmailConfig
  * Check if config is IfElseConfig.
  */
 export function isIfElseConfig(config: NodeConfig): config is IfElseConfig {
-  return 'pathAConditions' in config && 'pathBConditions' in config;
+  return 'pathACondition' in config && 'pathBCondition' in config;
 }
 
 // =============================================================================

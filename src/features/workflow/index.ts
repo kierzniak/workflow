@@ -8,7 +8,7 @@
  * - Validation schemas
  */
 
-// Types
+// Types - from types/workflow.ts
 export type {
   // Core types
   NodeType,
@@ -21,7 +21,6 @@ export type {
   ComparisonOperator,
   ConditionValue,
   Condition,
-  ConditionGroup,
   IfElseConfig,
   NodeConfig,
   // Node data structures
@@ -84,37 +83,67 @@ export {
 // Context
 export { WorkflowProvider, useWorkflow } from './context';
 
-// Node types registry (React Flow)
-export { nodeTypes } from './node-types';
-
 // Components
+export { WorkflowCanvas } from './components';
+
+// Node system - from nodes/
 export {
-  // Placeholder (unconfigured nodes)
-  PlaceholderNode as PlaceholderNodeComponent,
-  // Configured node base
+  // Registry
+  NODE_CATALOG,
+  NODE_DEFINITIONS,
+  getNodeCatalogByType,
+  getNodeCatalogEntry,
+  getNodeDefinition,
+  nodeTypes,
+  // Shared components
   ConfiguredNode,
   NodeBadge,
   NodeDescription,
-  // Trigger nodes
-  ScheduleTriggerNode,
-  // Action nodes
-  SendEmailActionNode,
-  IfElseActionNode,
-  // Helper nodes
+  PlaceholderNode as PlaceholderNodeComponent,
   PlusNode as PlusNodeComponent,
-} from './components';
+  // Schedule node
+  ScheduleConfigForm,
+  scheduleConfigSchema,
+  scheduleDefinition,
+  ScheduleTriggerNode,
+  // Send email node
+  SendEmailActionNode,
+  SendEmailConfigForm,
+  sendEmailConfigSchema,
+  sendEmailDefinition,
+  // If/else node
+  IfElseActionNode,
+  IfElseConfigForm,
+  ifElseConfigSchema,
+  ifElseDefinition,
+} from './components/nodes';
+
 export type {
-  // Placeholder props
-  PlaceholderNodeProps,
-  // Configured node props
+  // Node definition types
+  ConfigFormProps,
+  IconComponent,
+  NodeCatalogEntry,
+  NodeDefinition,
+  // Shared component props
   ConfiguredNodeProps,
   NodeBadgeProps,
   NodeDescriptionProps,
-  // Trigger node props
-  ScheduleTriggerNodeProps,
-  // Action node props
-  SendEmailActionNodeProps,
-  IfElseActionNodeProps,
-  // Helper node props
+  PlaceholderNodeProps,
   PlusNodeProps,
-} from './components';
+  // Schedule node types
+  ScheduleConfigFormProps,
+  ScheduleConfigInput,
+  ScheduleConfigOutput,
+  ScheduleTriggerNodeProps,
+  // Send email node types
+  SendEmailActionNodeProps,
+  SendEmailConfigFormProps,
+  SendEmailConfigInput,
+  SendEmailConfigOutput,
+  // If/else node types
+  ConditionInput,
+  IfElseActionNodeProps,
+  IfElseConfigFormProps,
+  IfElseConfigInput,
+  IfElseConfigOutput,
+} from './components/nodes';

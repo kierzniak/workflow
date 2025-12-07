@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 
 import type { TriggerNode as TriggerNodeType } from '@/features/workflow/types';
 
-import { ConfiguredNode, NodeBadge, NodeDescription } from './ConfiguredNode';
+import { ConfiguredNode, NodeBadge, NodeDescription } from '../ConfiguredNode';
 
 /**
  * Props for ScheduleTriggerNode component (React Flow custom node).
